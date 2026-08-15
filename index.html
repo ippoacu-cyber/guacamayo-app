@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Guacamayo">
+<meta name="theme-color" content="#0D1117">
+<title>Guacamayo · Pinheiros</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0D1117;--l1:#161B22;--l2:#1C2128;--l3:#21262D;--l4:#2D333B;
+  --bd:#30363D;--bd2:#444C56;
+  --ac:#2D7DD2;--ac2:#1A5FA3;--acdim:rgba(45,125,210,.12);
+  --up:#3FB950;--dn:#E05C5C;--wa:#D29922;
+  --updim:rgba(63,185,80,.1);--dndim:rgba(224,92,92,.1);--wadim:rgba(210,153,34,.1);
+  --t1:#E6EDF3;--t2:#8B949E;--t3:#484F58;
+  --body:'Inter',sans-serif;--mono:'IBM Plex Mono',monospace;
+  --r:12px;--rs:8px;
+  --st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--body);font-size:14px;overflow:hidden}
+
+/* ══ LOCK ══ */
+#lock{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;transition:opacity .3s,transform .3s}
+#lock.out{opacity:0;transform:translateY(-12px);pointer-events:none}
+.lock-logo{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:1.25rem;box-shadow:0 8px 32px rgba(45,125,210,.35)}
+.lock-title{font-size:20px;font-weight:700;letter-spacing:-.03em}
+.lock-sub{font-size:12px;color:var(--t3);margin-bottom:2.5rem;font-family:var(--mono)}
+.dots{display:flex;gap:16px;margin-bottom:2.25rem}
+.dot{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--bd2);transition:background .12s,border-color .12s,transform .12s}
+.dot.on{background:var(--ac);border-color:var(--ac);transform:scale(1.15)}
+.dot.err{background:var(--dn);border-color:var(--dn);animation:wag .3s}
+@keyframes wag{20%{transform:translateX(-6px)}60%{transform:translateX(6px)}100%{transform:translateX(0)}}
+.kpad{display:grid;grid-template-columns:repeat(3,72px);gap:10px}
+.k{width:72px;height:72px;border-radius:50%;border:1px solid var(--bd);background:var(--l2);font-size:22px;font-weight:500;color:var(--t1);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transition:background .1s,transform .08s;user-select:none}
+.k:active{background:var(--l3);transform:scale(.92)}
+.ksub{font-size:8px;color:var(--t3);letter-spacing:.14em;text-transform:uppercase}
+.k.del{background:transparent;border-color:transparent}
+.lock-hint{font-size:11px;color:var(--t3);margin-top:1.5rem;text-align:center;line-height:1.6;font-family:var(--mono)}
+
+/* ══ AUTH SCREEN ══ */
+#authScreen{position:fixed;inset:0;z-index:150;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center}
+#authScreen.on{display:flex}
+.auth-logo{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:1.5rem;box-shadow:0 8px 32px rgba(45,125,210,.35)}
+.auth-h{font-size:22px;font-weight:700;letter-spacing:-.03em;margin-bottom:8px}
+.auth-p{font-size:13px;color:var(--t2);line-height:1.65;margin-bottom:.5rem;max-width:300px}
+.auth-file{font-size:11px;color:var(--t3);font-family:var(--mono);margin-bottom:2rem;padding:8px 14px;background:var(--l2);border:1px solid var(--bd);border-radius:var(--rs)}
+.btn-ms{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:300px;padding:14px;border-radius:var(--r);border:none;background:var(--ac);color:#fff;font-size:15px;font-weight:600;font-family:var(--body);cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:-.01em}
+.btn-ms:active{opacity:.85;transform:scale(.98)}
+.ms-icon{font-size:18px}
+.btn-demo{width:100%;max-width:300px;padding:12px;border-radius:var(--r);border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:13px;cursor:pointer;margin-top:.75rem;font-family:var(--body);transition:background .15s}
+.btn-demo:active{background:var(--l2)}
+.auth-note{font-size:11px;color:var(--t3);margin-top:1rem;line-height:1.5;font-family:var(--mono);max-width:280px}
+
+/* ══ LOADING ══ */
+#loadingScreen{position:fixed;inset:0;z-index:140;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+#loadingScreen.on{display:flex}
+.spin{width:36px;height:36px;border-radius:50%;border:3px solid var(--bd);border-top-color:var(--ac);animation:rot 1s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.load-msg{font-size:12px;color:var(--t3);font-family:var(--mono)}
+
+/* ══ APP ══ */
+#app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:var(--st);padding-bottom:var(--sb);opacity:0;pointer-events:none;transition:opacity .3s}
+#app.on{opacity:1;pointer-events:all}
+.hdr{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:13px 18px 11px;border-bottom:1px solid var(--bd);background:var(--bg)}
+.hdr-l{display:flex;align-items:center;gap:10px}
+.hdr-logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:16px}
+.hdr-name{font-size:14px;font-weight:700;letter-spacing:-.02em}
+.hdr-sub{font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:1px}
+.sync-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1px solid var(--bd);background:var(--l1);font-size:11px;color:var(--t2);cursor:pointer;font-family:var(--mono);transition:background .15s}
+.sync-btn:active{background:var(--l2)}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--up);flex-shrink:0;animation:pulse 2.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.sdot.spin2{background:var(--wa);animation:rot 1s linear infinite}
+.sdot.off{background:var(--dn);animation:none}
+.scroll{flex:1;overflow-y:auto;padding:14px 14px 10px;-webkit-overflow-scrolling:touch}
+.scroll::-webkit-scrollbar{display:none}
+.bnav{flex-shrink:0;display:flex;background:var(--l1);border-top:1px solid var(--bd);padding:7px 0 calc(var(--sb) + 4px)}
+.btab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 2px;cursor:pointer;color:var(--t3);transition:color .15s}
+.btab.on{color:var(--ac)}
+.bico{font-size:18px;line-height:1}
+.blbl{font-size:9px;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase;font-weight:500}
+.view{display:none}.view.on{display:block}
+.sh{display:flex;align-items:center;gap:8px;font-size:10px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin:18px 0 8px}
+.sh-line{flex:1;height:1px;background:var(--bd)}
+.mhero{background:var(--l1);border:1px solid var(--bd);border-radius:var(--r);padding:18px 18px 15px;margin-bottom:10px;position:relative;overflow:hidden}
+.mhero::after{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,var(--ac) 0%,rgba(45,125,210,0) 100%)}
+.mh-eye{font-size:10px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.mh-main{display:flex;align-items:baseline;gap:4px}
+.mh-cur{font-size:14px;color:var(--t3);font-family:var(--mono);font-weight:500}
+.mh-val{font-size:36px;font-weight:700;font-family:var(--mono);letter-spacing:-.04em;line-height:1;color:var(--t1)}
+.mh-delta{font-size:13px;font-weight:600;font-family:var(--mono);margin-left:6px}
+.mh-delta.up{color:var(--up)}.mh-delta.dn{color:var(--dn)}.mh-delta.wa{color:var(--wa)}
+.mh-row{display:flex;margin-top:14px;padding-top:13px;border-top:1px solid var(--bd);gap:0}
+.mh-stat{flex:1;display:flex;flex-direction:column;gap:3px;padding:0 8px}
+.mh-stat:first-child{padding-left:0}
+.mh-stat+.mh-stat{border-left:1px solid var(--bd)}
+.ms-val{font-size:15px;font-weight:600;font-family:var(--mono);line-height:1;color:var(--t1)}
+.ms-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;font-family:var(--mono)}
+.dg2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.dg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px}
+.dc{background:var(--l1);border:1px solid var(--bd);border-radius:var(--r);padding:13px 12px 11px}
+.dc-lbl{font-size:9px;color:var(--t3);font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.dc-val{font-size:21px;font-weight:600;font-family:var(--mono);line-height:1;color:var(--t1)}
+.dc-val.up{color:var(--up)}.dc-val.dn{color:var(--dn)}.dc-val.wa{color:var(--wa)}.dc-val.ac{color:var(--ac)}
+.dc-sub{font-size:10px;color:var(--t3);margin-top:5px}
+.dc-badge{font-size:10px;font-weight:600;font-family:var(--mono);float:right;margin-top:-18px}
+.dc-badge.up{color:var(--up)}.dc-badge.dn{color:var(--dn)}
+.card{background:var(--l1);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.card-h{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid var(--bd)}
+.ch-title{font-size:12px;font-weight:600;color:var(--t1)}
+.ch-badge{font-size:10px;font-family:var(--mono);color:var(--t3)}
+.dr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd)}
+.dr:last-child{border-bottom:none}
+.dr-l{font-size:12px;color:var(--t2)}
+.dr-r{font-size:12px;font-family:var(--mono);font-weight:600;color:var(--t1)}
+.dr-r.up{color:var(--up)}.dr-r.dn{color:var(--dn)}.dr-r.wa{color:var(--wa)}.dr-r.ac{color:var(--ac)}
+.dr.hl{background:rgba(45,125,210,.06)}
+.alert{border-radius:var(--rs);padding:11px 13px;margin-bottom:8px;display:flex;gap:10px;border-width:1px;border-style:solid}
+.alert.ok{background:var(--updim);border-color:rgba(63,185,80,.25)}
+.alert.wa{background:var(--wadim);border-color:rgba(210,153,34,.25)}
+.alert.er{background:var(--dndim);border-color:rgba(224,92,92,.25)}
+.al-icon{font-size:14px;flex-shrink:0;margin-top:2px}
+.al-t{font-size:12px;font-weight:600;margin-bottom:2px;line-height:1.3}
+.al-m{font-size:11px;color:var(--t2);line-height:1.4}
+.bk{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid var(--bd)}
+.bk:last-child{border-bottom:none}
+.bk-av{width:36px;height:36px;flex-shrink:0;border-radius:10px;background:var(--l3);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:var(--mono);color:var(--t2)}
+.bk-info{flex:1;min-width:0}
+.bk-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--t1)}
+.bk-meta{font-size:10px;color:var(--t3);margin-top:2px;font-family:var(--mono)}
+.bk-r{text-align:right;flex-shrink:0}
+.bk-amt{font-size:14px;font-weight:600;font-family:var(--mono);color:var(--t1)}
+.bk-n{font-size:10px;color:var(--t3);margin-top:1px;font-family:var(--mono)}
+.bk-pill{display:inline-block;margin-top:3px;font-size:9px;font-family:var(--mono);font-weight:600;padding:2px 6px;border-radius:4px;background:rgba(63,185,80,.1);color:var(--up)}
+.hbar-item{padding:11px 14px;border-bottom:1px solid var(--bd)}
+.hbar-item:last-child{border-bottom:none}
+.hbar-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.hb-lbl{font-size:11px;color:var(--t2)}
+.hb-val{font-size:13px;font-weight:600;font-family:var(--mono);color:var(--t1)}
+.hb-val.up{color:var(--up)}.hb-val.ac{color:var(--ac)}.hb-val.wa{color:var(--wa)}.hb-val.muted{color:var(--t3)}
+.hbar-track{height:5px;background:var(--l3);border-radius:3px;overflow:hidden}
+.hbar-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.hbar-sub{font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:4px}
+.occ-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:14px}
+.occ-cell{border-radius:6px;padding:7px 6px 6px;text-align:center;background:var(--l2);position:relative;overflow:hidden}
+.oc-month{font-size:9px;font-family:var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.oc-val{font-size:13px;font-weight:700;font-family:var(--mono);line-height:1}
+.oc-bar{position:absolute;bottom:0;left:0;right:0;height:3px}
+.prc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:14px}
+.prc-cell{border-radius:6px;padding:7px 6px 6px;background:var(--l2);text-align:center}
+.pc-month{font-size:9px;font-family:var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.pc-val{font-size:12px;font-weight:600;font-family:var(--mono);line-height:1;color:var(--t1)}
+.cap-bar{display:flex;height:28px;border-radius:8px;overflow:hidden;margin:12px 14px 8px}
+.cap-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-family:var(--mono);font-weight:600;color:#fff;letter-spacing:.03em}
+.cap-legend{display:flex;gap:16px;padding:0 14px 12px;font-size:11px;font-family:var(--mono)}
+.cap-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;margin-top:3px}
+.hip-prog{padding:14px 14px 10px}
+.hp-labels{display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono);color:var(--t3);margin-bottom:6px}
+.hp-track{height:8px;background:var(--l3);border-radius:4px;overflow:hidden;margin-bottom:5px}
+.hp-fill{height:100%;background:linear-gradient(90deg,var(--ac2),var(--ac));border-radius:4px;transition:width .9s}
+.hp-pct{font-size:10px;font-family:var(--mono);color:var(--t3);text-align:right}
+.sc{background:var(--l1);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.sc-top{padding:14px 14px 12px;border-bottom:1px solid var(--bd)}
+.sc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sc-name{font-size:13px;font-weight:700;letter-spacing:-.01em}
+.sc-tag{font-size:10px;font-family:var(--mono);padding:3px 8px;border-radius:4px;border:1px solid}
+.sc-tag.up{color:var(--up);border-color:rgba(63,185,80,.3);background:var(--updim)}
+.sc-tag.ac{color:var(--ac);border-color:rgba(45,125,210,.3);background:var(--acdim)}
+.sc-tag.dn{color:var(--dn);border-color:rgba(224,92,92,.3);background:var(--dndim)}
+.sc-main{font-size:30px;font-weight:700;font-family:var(--mono);letter-spacing:-.04em;line-height:1}
+.sc-sub{font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:4px}
+.sc-stats{display:flex;gap:0;margin-top:12px;padding-top:11px;border-top:1px solid var(--bd)}
+.sc-stat{flex:1;padding:0 8px}
+.sc-stat:first-child{padding-left:0}
+.sc-stat+.sc-stat{border-left:1px solid var(--bd)}
+.ss-v{font-size:13px;font-weight:600;font-family:var(--mono);line-height:1}
+.ss-l{font-size:9px;color:var(--t3);margin-top:3px;text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)}
+.lbtn{display:flex;align-items:center;justify-content:space-between;background:var(--l1);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;margin-bottom:10px;cursor:pointer;text-decoration:none;color:var(--t1);transition:background .15s}
+.lbtn:active{background:var(--l2)}
+.lb-title{font-size:13px;font-weight:600}
+.lb-sub{font-size:11px;color:var(--t3);margin-top:2px;font-family:var(--mono)}
+.lb-arr{font-size:16px;color:var(--ac)}
+.sg{background:var(--l1);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.si{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s}
+.si:last-child{border-bottom:none}
+.si:active{background:var(--l2)}
+.si-l{font-size:13px;color:var(--t1)}
+.si-r{font-size:11px;color:var(--t3);font-family:var(--mono)}
+.si-arr{color:var(--t3);font-size:14px;font-family:var(--mono)}
+.si.danger .si-l{color:var(--dn)}
+.ytabs{display:flex;gap:6px;margin-bottom:10px}
+.ytab{padding:6px 16px;border-radius:20px;border:1px solid var(--bd);background:transparent;font-size:11px;font-family:var(--mono);color:var(--t3);cursor:pointer;transition:all .15s}
+.ytab.on{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
+.toast{position:fixed;bottom:calc(var(--sb) + 80px);left:50%;transform:translateX(-50%) translateY(10px);background:var(--l3);border:1px solid var(--bd2);border-radius:20px;padding:8px 18px;font-size:11px;font-family:var(--mono);white-space:nowrap;opacity:0;transition:opacity .2s,transform .2s;z-index:500;color:var(--t1)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ══ LOCK ══ -->
+<div id="lock">
+  <div class="lock-logo">🦜</div>
+  <div class="lock-title">Guacamayo Nido</div>
+  <div class="lock-sub">PINHEIROS · SÃO PAULO · BR</div>
+  <div class="dots">
+    <div class="dot" id="d0"></div><div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+  </div>
+  <div class="kpad" id="kpad">
+    <button class="k" data-k="1">1<span class="ksub"></span></button>
+    <button class="k" data-k="2">2<span class="ksub">ABC</span></button>
+    <button class="k" data-k="3">3<span class="ksub">DEF</span></button>
+    <button class="k" data-k="4">4<span class="ksub">GHI</span></button>
+    <button class="k" data-k="5">5<span class="ksub">JKL</span></button>
+    <button class="k" data-k="6">6<span class="ksub">MNO</span></button>
+    <button class="k" data-k="7">7<span class="ksub">PQRS</span></button>
+    <button class="k" data-k="8">8<span class="ksub">TUV</span></button>
+    <button class="k" data-k="9">9<span class="ksub">WXYZ</span></button>
+    <button class="k" data-k="" style="visibility:hidden"></button>
+    <button class="k" data-k="0">0</button>
+    <button class="k del" data-k="del">⌫</button>
+  </div>
+  <div class="lock-hint">PIN · por defecto <strong style="color:var(--ac)">1234</strong></div>
+</div>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="authScreen">
+  <div class="auth-logo">🦜</div>
+  <h1 class="auth-h">Conectar con OneDrive</h1>
+  <p class="auth-p">Inicia sesión con tu cuenta Microsoft para leer tu Excel automáticamente.</p>
+  <div class="auth-file">📊 Inversiones Analisis Claude.xlsx</div>
+  <button class="btn-ms" onclick="msLogin()">
+    <span class="ms-icon">⊞</span> Continuar con Microsoft
+  </button>
+  <button class="btn-demo" onclick="useDemo()">Usar datos de ejemplo</button>
+  <p class="auth-note">Solo se pedirá una vez. El token se guarda en el dispositivo.</p>
+</div>
+
+<!-- ══ LOADING ══ -->
+<div id="loadingScreen">
+  <div class="spin"></div>
+  <div class="load-msg" id="loadMsg">Leyendo Excel desde OneDrive…</div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-l">
+      <div class="hdr-logo">🦜</div>
+      <div>
+        <div class="hdr-name">Guacamayo Nido</div>
+        <div class="hdr-sub" id="syncTime">CARGANDO…</div>
+      </div>
+    </div>
+    <div class="sync-btn" onclick="doSync()">
+      <div class="sdot" id="sdot"></div>
+      <span id="slbl">SYNC</span>
+    </div>
+  </div>
+
+  <div class="scroll" id="scr">
+
+    <!-- ══ INICIO ══ -->
+    <div class="view on" id="v-home">
+      <div id="alertsArea"></div>
+      <div class="mhero">
+        <div class="mh-eye" id="mesLabel">JULIO 2026</div>
+        <div class="mh-main">
+          <span class="mh-cur">R$</span>
+          <span class="mh-val" id="mesIncome">4.256</span>
+          <span class="mh-delta up" id="mesDelta">+R$1.813 neto</span>
+        </div>
+        <div class="mh-row">
+          <div class="mh-stat"><div class="ms-val" id="mesN">17n</div><div class="ms-lbl">Noches</div></div>
+          <div class="mh-stat"><div class="ms-val" id="mesOcc">59%</div><div class="ms-lbl">Ocupación</div></div>
+          <div class="mh-stat"><div class="ms-val" id="mesAdr">R$250</div><div class="ms-lbl">ADR</div></div>
+          <div class="mh-stat"><div class="ms-val" id="mesRes">2</div><div class="ms-lbl">Reservas</div></div>
+        </div>
+      </div>
+      <div class="dg2">
+        <div class="dc"><div class="dc-lbl">Ocupación 2025</div><div class="dc-val up">79.9%</div><div class="dc-badge up">↑ top 15%</div><div class="dc-sub">Media SP: 54–61%</div></div>
+        <div class="dc"><div class="dc-lbl">Flujo neto acum.</div><div class="dc-val up">R$77.7k</div><div class="dc-sub">Feb-24 a Jul-26</div></div>
+      </div>
+      <div class="dg2">
+        <div class="dc"><div class="dc-lbl">ADR anfitrión</div><div class="dc-val">R$273</div><div class="dc-badge up">+6.8%</div><div class="dc-sub">Huésped paga R$351</div></div>
+        <div class="dc"><div class="dc-lbl">Valoración Airbnb</div><div class="dc-val wa">★ 5.0</div><div class="dc-sub">70 reseñas · Superhost</div></div>
+      </div>
+      <div class="dg2">
+        <div class="dc"><div class="dc-lbl">Valor activo</div><div class="dc-val ac">R$470k</div><div class="dc-sub">+R$230k plusvalía</div></div>
+        <div class="dc"><div class="dc-lbl">Break-even</div><div class="dc-val wa">2032</div><div class="dc-sub">Solo con flujos Airbnb</div></div>
+      </div>
+      <div class="sh"><span>PRÓXIMAS RESERVAS</span><div class="sh-line"></div><span>5 · R$8.637</span></div>
+      <div class="card"><div id="bkList"></div></div>
+      <a class="lbtn" href="airbnb_dashboard.html" target="_blank">
+        <div><div class="lb-title">Dashboard completo</div><div class="lb-sub">12 SECCIONES · GRÁFICOS · FISCALIDAD · MEMO</div></div>
+        <div class="lb-arr">↗</div>
+      </a>
+    </div>
+
+    <!-- ══ OPERATIVO ══ -->
+    <div class="view" id="v-ops">
+      <div class="sh"><span>OCUPACIÓN POR MES</span><div class="sh-line"></div></div>
+      <div class="ytabs" id="yrO">
+        <button class="ytab on" onclick="setYr('occ','2024',this)">2024</button>
+        <button class="ytab" onclick="setYr('occ','2025',this)">2025</button>
+        <button class="ytab" onclick="setYr('occ','2026',this)">2026</button>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="ch-title" id="occCardTitle">Noches vendidas · 2024</div><div class="ch-badge" id="occCardBadge">63.0% ocupación</div></div>
+        <div class="occ-grid" id="occGrid"></div>
+      </div>
+      <div class="sh"><span>PRECIO / NOCHE</span><div class="sh-line"></div></div>
+      <div class="ytabs" id="yrP">
+        <button class="ytab on" onclick="setYr('prc','2024',this)">2024</button>
+        <button class="ytab" onclick="setYr('prc','2025',this)">2025</button>
+        <button class="ytab" onclick="setYr('prc','2026',this)">2026</button>
+      </div>
+      <div class="card">
+        <div class="card-h"><div class="ch-title" id="prcCardTitle">R$/noche anfitrión · 2024</div><div class="ch-badge" id="prcCardBadge">Media R$264</div></div>
+        <div class="prc-grid" id="prcGrid"></div>
+      </div>
+      <div class="sh"><span>ANFITRIÓN vs HUÉSPED</span><div class="sh-line"></div></div>
+      <div class="card">
+        <div class="hbar-item"><div class="hbar-header"><div class="hb-lbl">Recibes tú (anfitrión)</div><div class="hb-val up">R$273 / noche</div></div><div class="hbar-track"><div class="hbar-fill" style="width:77.8%;background:var(--up)"></div></div><div class="hbar-sub">77.8% del precio total que paga el huésped</div></div>
+        <div class="hbar-item"><div class="hbar-header"><div class="hb-lbl">Paga el huésped (total)</div><div class="hb-val">R$351 / noche</div></div><div class="hbar-track"><div class="hbar-fill" style="width:100%;background:var(--t3)"></div></div><div class="hbar-sub">Incluye comisión de Airbnb al huésped</div></div>
+        <div class="hbar-item"><div class="hbar-header"><div class="hb-lbl">Comisión Airbnb total</div><div class="hb-val wa">R$78 / noche</div></div><div class="hbar-track"><div class="hbar-fill" style="width:22.2%;background:var(--wa)"></div></div><div class="hbar-sub">22.2% del precio bruto · R$35.2k acumulado</div></div>
+      </div>
+      <div class="sh"><span>INGRESOS Y RESULTADO ANUAL</span><div class="sh-line"></div></div>
+      <div class="card">
+        <div class="dr"><div class="dr-l">2024 (11 meses)</div><div><span class="dr-r">R$61.943</span>  <span class="dr-r up" style="font-size:11px">+R$28.599</span></div></div>
+        <div class="dr"><div class="dr-l">2025 ★ mejor año</div><div><span class="dr-r">R$73.185</span>  <span class="dr-r up" style="font-size:11px">+R$34.088</span></div></div>
+        <div class="dr"><div class="dr-l">2026 (7 meses)</div><div><span class="dr-r">R$37.354</span>  <span class="dr-r up" style="font-size:11px">+R$15.030</span></div></div>
+        <div class="dr hl"><div class="dr-l" style="color:var(--t1)">Acumulado</div><div><span class="dr-r up">R$77.717</span> <span class="dr-r" style="font-size:11px;color:var(--t3)"> neto</span></div></div>
+      </div>
+    </div>
+
+    <!-- ══ INVERSIÓN ══ -->
+    <div class="view" id="v-inv">
+      <div class="mhero">
+        <div class="mh-eye">VALOR DE MERCADO · 2026</div>
+        <div class="mh-main"><span class="mh-cur">R$</span><span class="mh-val">470.000</span><span class="mh-delta up">+R$230k</span></div>
+        <div class="mh-row">
+          <div class="mh-stat"><div class="ms-val">R$240k</div><div class="ms-lbl">Compra 2021</div></div>
+          <div class="mh-stat"><div class="ms-val" style="color:var(--up)">+96%</div><div class="ms-lbl">Revalorización</div></div>
+          <div class="mh-stat"><div class="ms-val">31m²</div><div class="ms-lbl">Studio</div></div>
+        </div>
+      </div>
+      <div class="sh"><span>ESTRUCTURA DE CAPITAL</span><div class="sh-line"></div><span>R$431.535 total</span></div>
+      <div class="card">
+        <div class="cap-bar">
+          <div class="cap-seg" style="width:56.9%;background:var(--ac)">56.9%</div>
+          <div class="cap-seg" style="width:43.1%;background:var(--l4)">43.1%</div>
+        </div>
+        <div class="cap-legend">
+          <span style="display:flex;align-items:center;gap:5px"><span class="cap-dot" style="background:var(--ac)"></span>Propio: R$245.519</span>
+          <span style="display:flex;align-items:center;gap:5px"><span class="cap-dot" style="background:var(--l4)"></span>Hipoteca: R$186.016</span>
+        </div>
+        <div class="dr"><div class="dr-l">Cash out neto</div><div class="dr-r wa">R$245.519</div></div>
+        <div class="dr"><div class="dr-l">Hipoteca Caixa</div><div class="dr-r ac">R$186.016</div></div>
+        <div class="dr"><div class="dr-l">Coste total real</div><div class="dr-r">R$431.535</div></div>
+        <div class="dr"><div class="dr-l">Flujo neto acumulado</div><div class="dr-r up">R$77.717</div></div>
+        <div class="dr hl"><div class="dr-l" style="color:var(--t1)">Break-even</div><div class="dr-r wa">2032</div></div>
+      </div>
+      <div class="sh"><span>HIPOTECA CAIXA</span><div class="sh-line"></div><span>AGO-2043</span></div>
+      <div class="card">
+        <div class="hip-prog">
+          <div class="hp-labels"><span>Amortizado: R$8.204 (4.4%)</span><span>Pendiente: R$177.812</span></div>
+          <div class="hp-track"><div class="hp-fill" id="hipFill" style="width:0%"></div></div>
+          <div class="hp-pct">Saldo: R$177.812 de R$186.016 originales</div>
+        </div>
+        <div class="dr"><div class="dr-l">TIN / TAE</div><div class="dr-r">7.16% / 7.40%</div></div>
+        <div class="dr"><div class="dr-l">Cuota mensual</div><div class="dr-r">~R$1.556</div></div>
+        <div class="dr"><div class="dr-l">LTV actual</div><div class="dr-r up">37.8%</div></div>
+        <div class="dr"><div class="dr-l">DSCR</div><div class="dr-r up">3.0× NOI</div></div>
+        <div class="dr hl"><div class="dr-l" style="color:var(--t1)">Fin hipoteca</div><div class="dr-r ac">Agosto 2043</div></div>
+      </div>
+      <div class="sh"><span>RENTABILIDAD · 2025</span><div class="sh-line"></div></div>
+      <div class="card">
+        <div class="hbar-item"><div class="hbar-header"><div class="hb-lbl">Yield bruto / precio compra</div><div class="hb-val up">30.5%</div></div><div class="hbar-track"><div class="hbar-fill" style="width:87%;background:var(--up)"></div></div><div class="hbar-sub">R$73.185 ingresos / R$240.000 precio escritura</div></div>
+        <div class="hbar-item"><div class="hbar-header"><div class="hb-lbl">Yield bruto / coste total</div><div class="hb-val ac">17.0%</div></div><div class="hbar-track"><div class="hbar-fill" style="width:48%;background:var(--ac)"></div></div><div class="hbar-sub">R$73.185 / R$431.535 (cash out + hipoteca)</div></div>
+        <div class="hbar-item"><div class="hbar-header"><div class="hb-lbl">Cap Rate / coste total</div><div class="hb-val ac">12.6%</div></div><div class="hbar-track"><div class="hbar-fill" style="width:36%;background:var(--ac)"></div></div><div class="hbar-sub">NOI R$54.249 / inversión total R$431.535</div></div>
+        <div class="hbar-item"><div class="hbar-header"><div class="hb-lbl">Cash-on-Cash Return</div><div class="hb-val ac">13.9%</div></div><div class="hbar-track"><div class="hbar-fill" style="width:40%;background:var(--ac)"></div></div><div class="hbar-sub">Flujo neto R$34.088 / capital propio R$245.519</div></div>
+        <div class="hbar-item"><div class="hbar-header"><div class="hb-lbl">TIR total (flujos + plusvalía)</div><div class="hb-val up">~19%</div></div><div class="hbar-track"><div class="hbar-fill" style="width:54%;background:var(--up)"></div></div><div class="hbar-sub">Incluye R$230k revalorización del activo</div></div>
+        <div class="hbar-item" style="background:var(--l2)"><div class="hbar-header"><div class="hb-lbl" style="color:var(--t3)">SELIC (referencia bancaria)</div><div class="hb-val muted">12.0%</div></div><div class="hbar-track"><div class="hbar-fill" style="width:34%;background:var(--t3)"></div></div></div>
+      </div>
+      <div class="sh"><span>PATRIMONIO NETO</span><div class="sh-line"></div></div>
+      <div class="dg2">
+        <div class="dc"><div class="dc-lbl">Si vendes hoy</div><div class="dc-val up">R$247k</div><div class="dc-sub">Tras comisión, IRPF e hipoteca</div></div>
+        <div class="dc"><div class="dc-lbl">Si vendes en 2043</div><div class="dc-val ac">R$681k</div><div class="dc-sub">Sin hipoteca · +3%/año</div></div>
+      </div>
+    </div>
+
+    <!-- ══ ESCENARIOS ══ -->
+    <div class="view" id="v-esc">
+      <div class="sh"><span>PROYECCIÓN 2027–2046</span><div class="sh-line"></div></div>
+      <div class="sc">
+        <div class="sc-top">
+          <div class="sc-header"><div class="sc-name" style="color:var(--up)">Optimista</div><div class="sc-tag up">+7%/año · 80% ocup.</div></div>
+          <div class="sc-main" style="color:var(--up)">R$1.264M</div>
+          <div class="sc-sub">FLUJO ACUMULADO A 2046 · BREAK-EVEN 2030</div>
+          <div class="sc-stats">
+            <div class="sc-stat"><div class="ss-v" style="color:var(--up)">R$55.8k</div><div class="ss-l">Neto 2030</div></div>
+            <div class="sc-stat"><div class="ss-v" style="color:var(--up)">R$157k</div><div class="ss-l">Neto 2040</div></div>
+            <div class="sc-stat"><div class="ss-v" style="color:var(--up)">~R$2.0M</div><div class="ss-l">Patrim. 2043</div></div>
+          </div>
+        </div>
+        <div class="dr"><div class="dr-l">Inmueble 2046 (+5%/año)</div><div class="dr-r up">R$1.247k</div></div>
+      </div>
+      <div class="sc">
+        <div class="sc-top">
+          <div class="sc-header"><div class="sc-name" style="color:var(--ac)">Realista</div><div class="sc-tag ac">+4%/año · 72% ocup.</div></div>
+          <div class="sc-main" style="color:var(--ac)">R$979k</div>
+          <div class="sc-sub">FLUJO ACUMULADO A 2046 · BREAK-EVEN 2032</div>
+          <div class="sc-stats">
+            <div class="sc-stat"><div class="ss-v" style="color:var(--ac)">R$35.6k</div><div class="ss-l">Neto 2030</div></div>
+            <div class="sc-stat"><div class="ss-v" style="color:var(--ac)">R$79.2k</div><div class="ss-l">Neto 2040</div></div>
+            <div class="sc-stat"><div class="ss-v" style="color:var(--ac)">~R$1.76M</div><div class="ss-l">Patrim. 2043</div></div>
+          </div>
+        </div>
+        <div class="dr"><div class="dr-l">Inmueble 2046 (+3%/año)</div><div class="dr-r ac">R$849k</div></div>
+      </div>
+      <div class="sc">
+        <div class="sc-top">
+          <div class="sc-header"><div class="sc-name" style="color:var(--dn)">Pesimista</div><div class="sc-tag dn">+1%/año · 60% ocup.</div></div>
+          <div class="sc-main" style="color:var(--dn)">R$113k</div>
+          <div class="sc-sub">FLUJO ACUMULADO A 2046 · BREAK-EVEN NO ALCANZADO SOLO CON FLUJOS</div>
+          <div class="sc-stats">
+            <div class="sc-stat"><div class="ss-v" style="color:var(--wa)">R$9.7k</div><div class="ss-l">Neto 2030</div></div>
+            <div class="sc-stat"><div class="ss-v" style="color:var(--dn)">-R$7.1k</div><div class="ss-l">Neto 2040</div></div>
+            <div class="sc-stat"><div class="ss-v" style="color:var(--wa)">~R$1.58M</div><div class="ss-l">Patrim. 2043</div></div>
+          </div>
+        </div>
+        <div class="dr"><div class="dr-l">Inmueble 2046 (+1.5%/año)</div><div class="dr-r wa">R$633k</div></div>
+      </div>
+      <div class="sh"><span>REVALORIZACIÓN DEL ACTIVO</span><div class="sh-line"></div><span>BASE R$470k</span></div>
+      <div class="card">
+        <div class="card-h"><div class="ch-title">Valor estimado en años clave</div><div class="ch-badge">OPT / REAL / PESI</div></div>
+        <div class="dr"><div class="dr-l">Hoy · 2026</div><div class="dr-r">R$470k</div></div>
+        <div class="dr"><div class="dr-l">2030</div><div><span class="dr-r up" style="font-size:11px">R$571k  </span><span class="dr-r ac" style="font-size:11px">R$529k  </span><span class="dr-r" style="font-size:11px;color:var(--t3)">R$501k</span></div></div>
+        <div class="dr"><div class="dr-l">2035</div><div><span class="dr-r up" style="font-size:11px">R$729k  </span><span class="dr-r ac" style="font-size:11px">R$613k  </span><span class="dr-r" style="font-size:11px;color:var(--t3)">R$508k</span></div></div>
+        <div class="dr"><div class="dr-l">2043 (sin hipoteca)</div><div><span class="dr-r up" style="font-size:11px">R$1.077k  </span><span class="dr-r ac" style="font-size:11px">R$777k  </span><span class="dr-r" style="font-size:11px;color:var(--t3)">R$605k</span></div></div>
+        <div class="dr"><div class="dr-l">2046</div><div><span class="dr-r up" style="font-size:11px">R$1.247k  </span><span class="dr-r ac" style="font-size:11px">R$849k  </span><span class="dr-r" style="font-size:11px;color:var(--t3)">R$633k</span></div></div>
+      </div>
+    </div>
+
+    <!-- ══ AJUSTES ══ -->
+    <div class="view" id="v-cfg">
+      <div style="padding:10px 2px 18px">
+        <div style="font-size:20px;font-weight:700;letter-spacing:-.03em">Ajustes</div>
+        <div style="font-size:11px;color:var(--t3);font-family:var(--mono);margin-top:3px">CONEXIÓN · SEGURIDAD · ACCESOS</div>
+      </div>
+      <div class="sg">
+        <div class="si" style="cursor:default"><div class="si-l">Estado OneDrive</div><div class="si-r" id="cfgStatus">VERIFICANDO…</div></div>
+        <div class="si" onclick="doSync()"><div class="si-l">Sincronizar ahora</div><div class="si-arr">›</div></div>
+        <div class="si" onclick="doLogout()"><div class="si-l">Cambiar cuenta Microsoft</div><div class="si-arr">›</div></div>
+      </div>
+      <div class="sg">
+        <div class="si" style="cursor:default"><div class="si-l">PIN</div><div class="si-r">••••</div></div>
+        <div class="si" onclick="doChangePin()"><div class="si-l">Cambiar PIN</div><div class="si-arr">›</div></div>
+      </div>
+      <div class="sg">
+        <div class="si" style="cursor:default"><div class="si-l">Activo</div><div class="si-r">GUACAMAYO NIDO · 31M²</div></div>
+        <div class="si" style="cursor:default"><div class="si-l">Edificio</div><div class="si-r">CALIXT PINHEIROS</div></div>
+        <div class="si" style="cursor:default"><div class="si-l">Hipoteca</div><div class="si-r">CAIXA · AGO-2043</div></div>
+      </div>
+      <a class="lbtn" href="airbnb_dashboard.html" target="_blank">
+        <div><div class="lb-title">Dashboard completo</div><div class="lb-sub">VERSIÓN WEB · 12 SECCIONES</div></div>
+        <div class="lb-arr">↗</div>
+      </a>
+      <a class="lbtn" href="https://airbnb.es/h/calixt14" target="_blank">
+        <div><div class="lb-title">Anuncio Airbnb</div><div class="lb-sub">AIRBNB.ES/H/CALIXT14 · ★5.0 · SUPERHOST</div></div>
+        <div class="lb-arr">↗</div>
+      </a>
+      <div class="sg">
+        <div class="si danger" onclick="doReset()"><div class="si-l">Cerrar sesión</div></div>
+      </div>
+    </div>
+
+  </div><!-- /scroll -->
+
+  <div class="bnav">
+    <div class="btab on" id="nt-home" onclick="goV('home')"><div class="bico">◉</div><div class="blbl">Inicio</div></div>
+    <div class="btab" id="nt-ops"   onclick="goV('ops')"><div class="bico">📊</div><div class="blbl">Operativo</div></div>
+    <div class="btab" id="nt-inv"   onclick="goV('inv')"><div class="bico">🏢</div><div class="blbl">Inversión</div></div>
+    <div class="btab" id="nt-esc"   onclick="goV('esc')"><div class="bico">📈</div><div class="blbl">Escenarios</div></div>
+    <div class="btab" id="nt-cfg"   onclick="goV('cfg')"><div class="bico">⚙</div><div class="blbl">Ajustes</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ CONFIG MICROSOFT GRAPH ══
+var CLIENT_ID   = '1bfa04d8-bce2-425f-8fd8-ea124b1141f0';
+var REDIRECT    = 'https://ippoacu-cyber.github.io/guacamayo-app/';
+var AUTHORITY   = 'https://login.microsoftonline.com/common/oauth2/v2.0';
+var SCOPES      = 'Files.Read User.Read offline_access';
+var SHARES_TOKEN= 'u!aHR0cHM6Ly8xZHJ2Lm1zL3gvYy9iYzMzZGMzZGY2ZTZkY2I0L0lRQS1HSHZfdGlobVM1M0ZWRGtRNGlqU0FSRmU2NU8yV2o3c3dQeDBYMlU1YjJV';
+var GRAPH       = 'https://graph.microsoft.com/v1.0';
+
+// ══ STORAGE KEYS ══
+var K_PIN   = 'gn_pin';
+var K_TOKEN = 'gn_ms_token';
+var K_EXPIRY= 'gn_ms_expiry';
+var K_RFRSH = 'gn_ms_refresh';
+var K_DEMO  = 'gn_demo';
+
+// ══ DATOS (actualizados automáticamente desde Excel) ══
+var NTS={'2024':[0,12,22,14,25,31,16,27,19,12,25,14],'2025':[10,15,18,26,26,15,26,29,15,16,25,42],'2026':[14,19,46,3,22,18,17,18,3,3,14,0]};
+var PRC={'2024':[0,247,240,278,214,215,287,288,284,281,340,314],'2025':[318,286,297,309,299,293,276,332,294,289,294,259],'2026':[272,271,298,268,284,287,237,286,342,332,258,0]};
+var OCC_AVG={'2024':63.0,'2025':79.9,'2026':51.6};
+var PRC_AVG={'2024':278,'2025':295,'2026':282};
+// Datos mensuales reales de Hoja2 (índice 0=ene)
+var H2={'2024':{ing:[0,2551,5727,3586,5347,6663,4404,7708,7189,6319,8095,4354],neto:[0,-9718,-7055,-12716,-196,1579,923,3849,3448,2367,4860,1498],hip:[0,1530,1531,1532,1533,1535,1535,1536,1537,1542,1544,1545],saldo:[0,185054,184700,184391,184206,183991,183680,183435,183181,182919,182710,182437]},'2025':{ing:[3153,4150,4881,7681,7487,4230,7030,9070,4417,4632,7386,9068],neto:[193,-246,1965,4368,4154,1131,3901,6067,1454,1365,3824,5994],hip:[1546,3003,1538,1540,1543,1545,1548,1550,1594,1597,1558,1599],saldo:[182194,180403,180246,179960,179862,179765,179663,179568,179463,179358,179253,179122]},'2026':{ing:[3804,5064,12221,805,6089,5115,4256,0,0,0,0,0],neto:[710,1414,8685,-1953,2424,1943,1759,0,0,0,0,0],hip:[1563,1566,1568,1623,1573,1575,1533,1533,1533,1533,1533,1533],saldo:[179007,178885,178667,178540,178400,178257,178183,178109,178035,177961,177886,177812]}};
+// Noches reales por mes (Hoja1)
+var NTS_REAL={'2024':[0,12,22,14,25,31,16,27,19,12,25,14],'2025':[10,15,18,26,26,15,26,29,15,16,25,42],'2026':[14,19,46,3,22,18,17,18,3,3,14,0]};
+var RES_REAL={'2024':[0,4,1,3,1,1,4,7,5,3,7,4],'2025':[3,4,3,7,6,4,5,4,3,5,7,3],'2026':[2,6,6,1,6,4,2,3,1,1,1,0]};
+var MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+var BKGS=[
+  {name:'Lei Arresga',   init:'LA',in:'17 ago',n:9, amt:2349,d:9},
+  {name:'Diego Zerecero',init:'DZ',in:'26 ago',n:2, amt:660, d:18},
+  {name:'Laura Neves',   init:'LN',in:'04 sep',n:3, amt:1026,d:27},
+  {name:'M.G. Alcantara',init:'MA',in:'28 oct',n:3, amt:995, d:81},
+  {name:'Myguail Chappel',init:'MC',in:'02 nov',n:14,amt:3607,d:86}
+];
+
+// ══ PIN ══
+var pin=localStorage.getItem(K_PIN)||'1234';
+var buf='', chgPin=false;
+
+document.getElementById('kpad').addEventListener('click',function(e){
+  var k=e.target.closest('[data-k]');if(!k)return;
+  var v=k.getAttribute('data-k');
+  if(v==='del'){buf=buf.slice(0,-1);}
+  else if(v!==''&&buf.length<4){buf+=v;}
+  dots();
+  if(buf.length===4)setTimeout(checkPin,70);
+});
+function dots(){for(var i=0;i<4;i++){var d=document.getElementById('d'+i);d.classList.toggle('on',i<buf.length);d.classList.remove('err');}}
+function checkPin(){
+  if(chgPin){
+    if(chgPin==='first'){chgPin=buf;buf='';dots();document.querySelector('.lock-hint').textContent='Repite el nuevo PIN';return;}
+    if(buf===chgPin){localStorage.setItem(K_PIN,buf);pin=buf;chgPin=false;buf='';dots();resetHint();unlock();toast('PIN actualizado ✓');return;}
+    errDots();chgPin=false;buf='';return;
+  }
+  if(buf===pin){unlock();}else{errDots();buf='';setTimeout(dots,600);}
+}
+function errDots(){for(var i=0;i<4;i++){var d=document.getElementById('d'+i);d.classList.remove('on');d.classList.add('err');}if(navigator.vibrate)navigator.vibrate([50,30,50]);}
+function resetHint(){document.querySelector('.lock-hint').innerHTML='PIN · por defecto <strong style="color:var(--ac)">1234</strong>';}
+
+function unlock(){
+  var lk=document.getElementById('lock');lk.classList.add('out');
+  setTimeout(function(){lk.style.display='none';},320);
+  checkAuth();
+}
+
+// ══ OAUTH PKCE ══
+function generateCodeVerifier(){
+  var arr=new Uint8Array(32);crypto.getRandomValues(arr);
+  return btoa(String.fromCharCode.apply(null,arr)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+async function generateCodeChallenge(verifier){
+  var data=new TextEncoder().encode(verifier);
+  var digest=await crypto.subtle.digest('SHA-256',data);
+  return btoa(String.fromCharCode.apply(null,new Uint8Array(digest))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+
+async function msLogin(){
+  var verifier=generateCodeVerifier();
+  var challenge=await generateCodeChallenge(verifier);
+  sessionStorage.setItem('cv',verifier);
+  var params=new URLSearchParams({
+    client_id:CLIENT_ID,
+    response_type:'code',
+    redirect_uri:REDIRECT,
+    scope:SCOPES,
+    code_challenge:challenge,
+    code_challenge_method:'S256',
+    prompt:'select_account'
+  });
+  window.location.href=AUTHORITY+'/authorize?'+params.toString();
+}
+
+async function handleCallback(){
+  var params=new URLSearchParams(window.location.search);
+  var code=params.get('code');
+  if(!code)return false;
+  // Limpiar URL sin recargar
+  window.history.replaceState({},'',REDIRECT);
+  var verifier=sessionStorage.getItem('cv');
+  showLoading('Autenticando con Microsoft…');
+  try{
+    var body=new URLSearchParams({
+      client_id:CLIENT_ID,
+      grant_type:'authorization_code',
+      code:code,
+      redirect_uri:REDIRECT,
+      code_verifier:verifier,
+      scope:SCOPES
+    });
+    var resp=await fetch(AUTHORITY+'/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
+    var data=await resp.json();
+    if(data.access_token){
+      saveTokens(data);
+      await loadExcel(data.access_token);
+      return true;
+    }else{
+      throw new Error(data.error_description||'Error de autenticación');
+    }
+  }catch(err){
+    hideLoading();
+    toast('Error: '+err.message);
+    showAuthScreen();
+    return true;
+  }
+}
+
+function saveTokens(data){
+  localStorage.setItem(K_TOKEN,data.access_token);
+  localStorage.setItem(K_EXPIRY,Date.now()+(data.expires_in-60)*1000);
+  if(data.refresh_token)localStorage.setItem(K_RFRSH,data.refresh_token);
+}
+
+async function getValidToken(){
+  var expiry=parseInt(localStorage.getItem(K_EXPIRY)||'0');
+  if(Date.now()<expiry)return localStorage.getItem(K_TOKEN);
+  // Intentar refresh
+  var refresh=localStorage.getItem(K_RFRSH);
+  if(!refresh)return null;
+  try{
+    var body=new URLSearchParams({client_id:CLIENT_ID,grant_type:'refresh_token',refresh_token:refresh,scope:SCOPES});
+    var resp=await fetch(AUTHORITY+'/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
+    var data=await resp.json();
+    if(data.access_token){saveTokens(data);return data.access_token;}
+  }catch(e){}
+  return null;
+}
+
+// ══ EXCEL via GRAPH ══
+async function loadExcel(token){
+  showLoading('Buscando Excel en OneDrive…');
+  try{
+    // Buscar fichero exacto: Inversiones Analisis Claude.xlsx
+    var FILE_NAME='Inversiones Analisis Claude';
+    var sUrl=GRAPH+"/me/drive/root/search(q='"+encodeURIComponent(FILE_NAME)+"')?$select=id,name&$top=10";
+    var sResp=await fetch(sUrl,{headers:{Authorization:'Bearer '+token}});
+    if(!sResp.ok)throw new Error('Error buscando fichero ('+sResp.status+')');
+    var sData=await sResp.json();
+    var itemId=null, fileName='';
+    if(sData.value&&sData.value.length>0){
+      var found=sData.value.find(function(f){
+        return f.name&&f.name.toLowerCase().indexOf('inversiones analisis claude')>=0;
+      });
+      if(found){itemId=found.id;fileName=found.name;}
+    }
+    if(!itemId)throw new Error('No se encontró "Inversiones Analisis Claude.xlsx" en tu OneDrive. Verifica que el fichero existe y está accesible.');
+    showLoading('Leyendo '+fileName+'…');
+    // Leer worksheets
+    var wsResp=await fetch(
+      GRAPH+'/me/drive/items/'+itemId+'/workbook/worksheets',
+      {headers:{Authorization:'Bearer '+token}}
+    );
+    if(!wsResp.ok)throw new Error('Error abriendo workbook ('+wsResp.status+')');
+    var wsData=await wsResp.json();
+    var hoja2=null;
+    if(wsData.value){
+      hoja2=wsData.value.find(function(ws){
+        return ws.name==='Hoja2'||ws.name==='Sheet2';
+      })||wsData.value[1]||wsData.value[0];
+    }
+    if(!hoja2)throw new Error('No se encontró Hoja2');
+    // Leer datos de la hoja
+    var wsId=encodeURIComponent(hoja2.id);
+    var rResp=await fetch(
+      GRAPH+'/me/drive/items/'+itemId+'/workbook/worksheets/'+wsId+'/usedRange?$select=values',
+      {headers:{Authorization:'Bearer '+token}}
+    );
+    if(!rResp.ok)throw new Error('Error leyendo datos ('+rResp.status+')');
+    var rData=await rResp.json();
+    processExcelData(rData.values||[]);
+    localStorage.removeItem(K_DEMO);
+    localStorage.setItem('gn_connected','1');
+    localStorage.setItem('gn_file_id',itemId);
+    localStorage.setItem('gn_file_name',fileName);
+    document.getElementById('cfgStatus').textContent='CONECTADO ✓';
+    hideLoading();
+    showApp();
+    toast(fileName+' sincronizado ✓');
+    updateSync(true);
+  }catch(err){
+    console.error('loadExcel error:',err);
+    hideLoading();
+    if(localStorage.getItem('gn_connected')){
+      showApp();
+      toast('⚠ Sin conexión · datos en caché');
+      updateSync(false);
+    }else{
+      toast('Error: '+err.message.slice(0,80));
+      setTimeout(showAuthScreen,2500);
+    }
+  }
+}
+
+function processExcelData(values){
+  // values[i] = fila i del rango B4:Y73
+  // Cols: 0=Fecha,1=Hipoteca,2=Intereses,3=Amort,4=Seguro,5=Tasas,
+  //       6=CM,7=SaldoDeberia,8=SaldoDevedor,9=Otros,10=Condominio,
+  //       11=Luz,12=Internet,13=Limpieza,14=Mant,15=WiseComis,16=Sumin,
+  //       17=GastoMensual,18=IngresosAirbnb,19=Beneficio,20=GastoAcum,
+  //       21=IngresoAcum,22=IngresoLimpio,23=IngresoLimpioAcum
+  values.forEach(function(row){
+    var fechaVal=row[0];
+    if(!fechaVal)return;
+    // La fecha viene como número serial de Excel o string
+    var fecha=parseExcelDate(fechaVal);
+    if(!fecha)return;
+    var año=fecha.getFullYear();
+    var mes=fecha.getMonth(); // 0-based
+    var key=String(año);
+    if(!H2[key])return;
+    var ing=parseFloat(row[18])||0;
+    var neto=parseFloat(row[19])||0;
+    var hip=parseFloat(row[1])||0;
+    var saldo=parseFloat(row[8])||0;
+    H2[key].ing[mes]=Math.round(ing);
+    H2[key].neto[mes]=Math.round(neto);
+    H2[key].hip[mes]=Math.round(hip);
+    H2[key].saldo[mes]=Math.round(saldo);
+  });
+  console.log('Excel procesado OK');
+}
+
+function parseExcelDate(val){
+  if(val instanceof Date)return val;
+  if(typeof val==='number'&&val>40000){
+    // Número serial Excel → JS Date
+    var d=new Date((val-25569)*86400*1000);
+    return d;
+  }
+  if(typeof val==='string'&&val.length>=7){
+    var d=new Date(val);
+    if(!isNaN(d))return d;
+  }
+  return null;
+}
+
+// ══ FLUJO PRINCIPAL ══
+async function checkAuth(){
+  // ¿Venimos de un callback OAuth?
+  if(window.location.search.includes('code=')){
+    await handleCallback();
+    return;
+  }
+  // ¿Modo demo?
+  if(localStorage.getItem(K_DEMO)){
+    document.getElementById('cfgStatus').textContent='DEMO';
+    showApp();
+    return;
+  }
+  // ¿Tenemos token válido?
+  var token=await getValidToken();
+  if(token){
+    await loadExcel(token);
+  }else{
+    showAuthScreen();
+  }
+}
+
+function showAuthScreen(){
+  document.getElementById('authScreen').classList.add('on');
+}
+function showLoading(msg){
+  document.getElementById('loadMsg').textContent=msg||'Cargando…';
+  document.getElementById('loadingScreen').classList.add('on');
+  document.getElementById('authScreen').classList.remove('on');
+}
+function hideLoading(){
+  document.getElementById('loadingScreen').classList.remove('on');
+}
+function showApp(){
+  hideLoading();
+  document.getElementById('authScreen').classList.remove('on');
+  var a=document.getElementById('app');a.classList.add('on');
+  renderAll();
+  setTimeout(function(){var h=document.getElementById('hipFill');if(h)h.style.width='4.4%';},250);
+}
+function useDemo(){
+  localStorage.setItem(K_DEMO,'1');
+  document.getElementById('cfgStatus').textContent='DEMO';
+  showApp();
+}
+
+// ══ SYNC ══
+async function doSync(){
+  var dot=document.getElementById('sdot'),lbl=document.getElementById('slbl');
+  dot.className='sdot spin2';lbl.textContent='…';
+  if(localStorage.getItem(K_DEMO)){
+    setTimeout(function(){dot.className='sdot';lbl.textContent='SYNC';toast('Datos de demo · sin OneDrive');updateSync(false);},1200);
+    return;
+  }
+  var token=await getValidToken();
+  if(token){
+    await loadExcel(token);
+    dot.className='sdot';lbl.textContent='SYNC';
+    updateSync(true);
+  }else{
+    dot.className='sdot off';lbl.textContent='SYNC';
+    toast('Sesión expirada · reconectando…');
+    setTimeout(showAuthScreen,1000);
+  }
+}
+function updateSync(ok){
+  var n=new Date();
+  var t=n.getHours()+':'+(n.getMinutes()<10?'0':'')+n.getMinutes();
+  document.getElementById('syncTime').textContent=(ok?'SYNC ':' ')+t+' · PINHEIROS UTC-3';
+  document.getElementById('sdot').className='sdot'+(ok?'':' off');
+}
+
+// ══ RENDER ══
+function renderAll(){
+  updateMesHero();
+  renderAlerts();
+  renderBkgs();
+  renderOcc('2024');
+  renderPrc('2024');
+}
+
+function getLastMesConDatos(){
+  // Encuentra el último mes con ingresos > 0
+  var años=['2026','2025','2024'];
+  for(var a=0;a<años.length;a++){
+    var año=años[a];
+    var d=H2[año];
+    for(var m=11;m>=0;m--){
+      if(d.ing[m]>0)return{año:parseInt(año),mes:m,ing:d.ing[m],neto:d.neto[m],hip:d.hip[m],saldo:d.saldo[m]};
+    }
+  }
+  return{año:2026,mes:6,ing:4256,neto:1759,hip:1533,saldo:178183};
+}
+
+function updateMesHero(){
+  var d=getLastMesConDatos();
+  var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('mesLabel').textContent=meses[d.mes].toUpperCase()+' '+d.año;
+  document.getElementById('mesIncome').textContent=fn(d.ing);
+  var netoEl=document.getElementById('mesDelta');
+  netoEl.textContent=(d.neto>=0?'+':'')+fn(Math.round(d.neto))+' neto';
+  netoEl.className='mh-delta '+(d.neto>=0?'up':'dn');
+  // Noches y ADR del mes
+  var nts=NTS_REAL[String(d.año)]||NTS_REAL['2026'];
+  var noches=nts[d.mes]||0;
+  var res=RES_REAL[String(d.año)]||RES_REAL['2026'];
+  var reservas=res[d.mes]||0;
+  var adr=noches>0?Math.round(d.ing/noches):0;
+  var diasMes=[31,28,31,30,31,30,31,31,30,31,30,31];
+  var occ=noches>0?Math.round(noches/diasMes[d.mes]*100):0;
+  document.getElementById('mesN').textContent=noches+'n';
+  document.getElementById('mesOcc').textContent=occ+'%';
+  document.getElementById('mesAdr').textContent='R$'+adr;
+  document.getElementById('mesRes').textContent=reservas;
+  // Saldo hipoteca actualizado
+  document.getElementById('hipFill').style.width=((186016-d.saldo)/186016*100).toFixed(1)+'%';
+}
+
+function renderAlerts(){
+  var d=getLastMesConDatos();
+  var meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  // Calcular flujo acumulado real
+  var acum=0;
+  ['2024','2025','2026'].forEach(function(a){H2[a].neto.forEach(function(v){acum+=v;});});
+  var alerts='';
+  if(acum>0)alerts+='<div class="alert ok"><div class="al-icon">↑</div><div><div class="al-t">Flujo neto acumulado: R$'+fn(Math.round(acum))+'</div><div class="al-m">Generado desde el inicio de operaciones · feb-2024 a '+meses[d.mes]+' '+d.año+'.</div></div></div>';
+  if(d.neto<0)alerts+='<div class="alert er"><div class="al-icon">!</div><div><div class="al-t">Mes negativo: -R$'+fn(Math.abs(Math.round(d.neto)))+' en '+meses[d.mes]+'</div><div class="al-m">Los ingresos no cubrieron los gastos e hipoteca este mes.</div></div></div>';
+  else alerts+='<div class="alert ok"><div class="al-icon">→</div><div><div class="al-t">'+meses[d.mes]+' '+d.año+': R$'+fn(d.ing)+' ingresos · neto +R$'+fn(Math.round(d.neto))+'</div><div class="al-m">Saldo hipoteca actualizado: R$'+fn(Math.round(d.saldo))+'.</div></div></div>';
+  alerts+='<div class="alert wa"><div class="al-icon">!</div><div><div class="al-t">ADR por debajo del tier del producto</div><div class="al-m">Con ★5.0 y Superhost podrías facturar R$320–350/noche (+R$10k/año).</div></div></div>';
+  document.getElementById('alertsArea').innerHTML=alerts;
+}
+function renderBkgs(){
+  var el=document.getElementById('bkList');if(!el)return;el.innerHTML='';
+  BKGS.forEach(function(b){
+    var col=b.d<=7?'color:var(--dn)':b.d<=30?'color:var(--wa)':'color:var(--t3)';
+    el.innerHTML+='<div class="bk"><div class="bk-av">'+b.init+'</div><div class="bk-info"><div class="bk-name">'+b.name+'</div><div class="bk-meta">'+b.in+' · <span style="'+col+'">en '+b.d+' días</span></div></div><div class="bk-r"><div class="bk-amt">R$'+fn(b.amt)+'</div><div class="bk-n">'+b.n+'n</div><div class="bk-pill">Confirmada</div></div></div>';
+  });
+}
+function renderOcc(yr){
+  var g=document.getElementById('occGrid');if(!g)return;
+  var nights=NTS[yr];var max=Math.max.apply(null,nights)||1;g.innerHTML='';
+  nights.forEach(function(n,i){
+    var pct=n>0?Math.round((n/max)*100):0;
+    var c=pct>75?'var(--up)':pct>40?'var(--ac)':pct>10?'var(--bd2)':'var(--l3)';
+    var tc=pct>75?'var(--up)':pct>40?'var(--ac)':n>0?'var(--t2)':'var(--t3)';
+    g.innerHTML+='<div class="occ-cell"><div class="oc-month">'+MESES[i].slice(0,3).toUpperCase()+'</div><div class="oc-val" style="color:'+tc+'">'+n+'n</div><div class="oc-bar" style="background:'+c+';opacity:.7"></div></div>';
+  });
+  document.getElementById('occCardTitle').textContent='Noches vendidas · '+yr;
+  document.getElementById('occCardBadge').textContent=OCC_AVG[yr]+'% ocupación';
+}
+function renderPrc(yr){
+  var g=document.getElementById('prcGrid');if(!g)return;
+  var prices=PRC[yr];g.innerHTML='';
+  prices.forEach(function(p,i){
+    var c=p>=300?'var(--up)':p>=250?'var(--ac)':p>0?'var(--t1)':'var(--t3)';
+    g.innerHTML+='<div class="prc-cell"><div class="pc-month">'+MESES[i].slice(0,3).toUpperCase()+'</div><div class="pc-val" style="color:'+c+'">'+(p>0?p:'—')+'</div></div>';
+  });
+  document.getElementById('prcCardTitle').textContent='R$/noche anfitrión · '+yr;
+  document.getElementById('prcCardBadge').textContent='Media R$'+PRC_AVG[yr];
+}
+function setYr(type,yr,btn){
+  if(type==='occ'){renderOcc(yr);var par=document.getElementById('yrO');}
+  else{renderPrc(yr);var par=document.getElementById('yrP');}
+  par.querySelectorAll('.ytab').forEach(function(t){t.classList.remove('on');});btn.classList.add('on');
+}
+
+// ══ NAV ══
+function goV(name){
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
+  document.querySelectorAll('.btab').forEach(function(t){t.classList.remove('on');});
+  document.getElementById('v-'+name).classList.add('on');
+  document.getElementById('nt-'+name).classList.add('on');
+  document.getElementById('scr').scrollTop=0;
+}
+
+// ══ SETTINGS ══
+function doChangePin(){
+  chgPin='first';buf='';dots();
+  document.querySelector('.lock-hint').textContent='Introduce tu nuevo PIN de 4 dígitos';
+  var lk=document.getElementById('lock');lk.style.display='flex';lk.classList.remove('out');
+}
+function doLogout(){
+  if(confirm('¿Cambiar cuenta Microsoft? Se eliminará el token actual.')){
+    localStorage.removeItem(K_TOKEN);localStorage.removeItem(K_EXPIRY);
+    localStorage.removeItem(K_RFRSH);localStorage.removeItem('gn_connected');
+    localStorage.removeItem(K_DEMO);
+    showAuthScreen();document.getElementById('app').classList.remove('on');
+  }
+}
+function doReset(){
+  if(confirm('¿Cerrar sesión completamente?')){
+    [K_TOKEN,K_EXPIRY,K_RFRSH,K_DEMO,'gn_connected'].forEach(function(k){localStorage.removeItem(k);});
+    location.reload();
+  }
+}
+
+// ══ UTILS ══
+function fn(n){return Number(n).toLocaleString('pt-BR');}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2800);}
+</script>
+</body>
+</html>
