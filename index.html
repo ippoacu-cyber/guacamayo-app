@@ -638,39 +638,55 @@ async function getValidToken(){
 
 // ══ EXCEL via GRAPH ══
 async function loadExcel(token){
-  showLoading('Leyendo Excel desde OneDrive…');
+  showLoading('Buscando Excel en OneDrive…');
   try{
-    // Obtener info del fichero compartido
-    var r=await fetch(GRAPH+'/shares/'+SHARES_TOKEN+'/driveItem',{
-      headers:{Authorization:'Bearer '+token}
-    });
-    if(!r.ok)throw new Error('No se pudo acceder al fichero ('+r.status+')');
-    var item=await r.json();
-    // Leer hoja principal — primero obtener las hojas disponibles
-    var wsResp=await fetch(GRAPH+'/shares/'+SHARES_TOKEN+'/driveItem/workbook/worksheets',{
-      headers:{Authorization:'Bearer '+token,'workbook-session-id':''}
-    });
-    if(wsResp.ok){
-      var wsData=await wsResp.json();
-      // Datos leídos correctamente
-      localStorage.removeItem(K_DEMO);
-      localStorage.setItem('gn_connected','1');
-      document.getElementById('cfgStatus').textContent='CONECTADO ✓';
+    // Estrategia 1: buscar por nombre en el OneDrive del usuario
+    var searchResp=await fetch(
+      GRAPH+"/me/drive/root/search(q='Inversiones Analisis Claude')?$select=id,name,webUrl&$top=5",
+      {headers:{Authorization:'Bearer '+token}}
+    );
+    if(!searchResp.ok)throw new Error('Error buscando fichero ('+searchResp.status+')');
+    var searchData=await searchResp.json();
+    var xlsxFile=null;
+    if(searchData.value&&searchData.value.length>0){
+      // Buscar el fichero exacto
+      xlsxFile=searchData.value.find(function(f){
+        return f.name&&f.name.toLowerCase().indexOf('inversiones')>=0;
+      })||searchData.value[0];
+    }
+    if(!xlsxFile){
+      // Estrategia 2: usar el enlace compartido directamente
+      showLoading('Accediendo por enlace compartido…');
+      var shareResp=await fetch(GRAPH+'/shares/'+SHARES_TOKEN+'/driveItem?$select=id,name,parentReference',
+        {headers:{Authorization:'Bearer '+token}}
+      );
+      if(!shareResp.ok)throw new Error('Fichero no encontrado ('+shareResp.status+'). Asegúrate de que el fichero está en tu OneDrive.');
+      xlsxFile=await shareResp.json();
+    }
+    // Fichero encontrado — marcar como conectado
+    showLoading('Excel encontrado: '+xlsxFile.name);
+    localStorage.removeItem(K_DEMO);
+    localStorage.setItem('gn_connected','1');
+    localStorage.setItem('gn_file_id', xlsxFile.id||'');
+    localStorage.setItem('gn_file_name', xlsxFile.name||'Inversiones Analisis Claude.xlsx');
+    document.getElementById('cfgStatus').textContent='CONECTADO ✓';
+    setTimeout(function(){
       hideLoading();
       showApp();
-      toast('Excel sincronizado ✓');
+      toast('OneDrive conectado: '+xlsxFile.name+' ✓');
       updateSync(true);
-    }else{
-      throw new Error('Error leyendo hojas ('+wsResp.status+')');
-    }
+    }, 800);
   }catch(err){
+    console.error('loadExcel error:', err);
     hideLoading();
-    toast('⚠ '+err.message);
-    // Si hay token guardado, mostrar app con datos en memoria
+    // Si ya estuvo conectado antes, mostrar app con datos en caché
     if(localStorage.getItem('gn_connected')){
       showApp();
+      toast('⚠ Sin conexión · mostrando datos en caché');
+      updateSync(false);
     }else{
-      showAuthScreen();
+      toast('Error: '+err.message);
+      setTimeout(showAuthScreen, 1500);
     }
   }
 }
