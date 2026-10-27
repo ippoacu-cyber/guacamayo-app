@@ -171,13 +171,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <div class="kpi" title="Lo que recibes por noche despues de la comision Airbnb. El huesped paga de media R$351/noche incluyendo tasas y comision.">
       <div class="kpi-lbl">Precio/noche anfitrion</div><div class="kpi-val" id="kpiAdrTot">R$273</div><div class="kpi-sub" id="kpiAdrSub">Huesped paga R$351/noche</div>
     </div>
-    <div class="kpi" title="Flujo neto acumulado desde el inicio de Airbnb: ingresos menos cuota hipoteca (que ya incluye la correccion monetaria IPCA dentro) menos gastos operativos. La CM no es un coste extra sino que reduce la parte de amortizacion de capital dentro de la cuota.">
+    <div class="kpi" title="Flujo neto acumulado desde el inicio de Airbnb: ingresos menos coste de la hipoteca (intereses + amortizacion + seguro + tasas, igual que el Beneficio del Excel) menos gastos operativos. La correccion monetaria NO se paga en la cuota: sube el saldo de la deuda y reduce cuanto capital baja de verdad.">
       <div class="kpi-lbl">Flujo neto acum.</div><div class="kpi-val g" id="kpiFlujoTot">R$77.7k</div><div class="kpi-sub">Feb 2024 - hoy</div>
     </div>
     <div class="kpi" title="Suma de comisiones Airbnb: la que paga el huesped + la que se descuenta al anfitrion.">
       <div class="kpi-lbl">Comision Airbnb total</div><div class="kpi-val w" id="kpiComTot">R$35.2k</div><div class="kpi-sub" id="kpiComSub">Huesped R$28.1k + Anfitrion R$7.1k</div>
     </div>
-    <div class="kpi" title="Capital propio desembolsado en efectivo para compra, gastos, reforma y puesta en marcha. No incluye los R$186.016 financiados por la hipoteca.">
+    <div class="kpi" title="Capital propio desembolsado en efectivo para compra, gastos, reforma y puesta en marcha. No incluye los R$186.066 financiados por la hipoteca.">
       <div class="kpi-lbl">Cash out total neto</div><div class="kpi-val w">R$245.5k</div><div class="kpi-sub">Capital propio invertido</div>
     </div>
   </div>
@@ -404,24 +404,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 <section class="section" id="inversion">
   <div class="sec-hdr"><span class="sec-title">Estructura de la inversion</span><div class="sec-line"></div><span class="sec-note">2021 - 2026</span></div>
   <div class="kpi-grid" style="margin-bottom:12px">
-    <div class="kpi hi" title="Todo el dinero desembolsado en efectivo para adquirir, escriturar, reformar y poner en marcha el apartamento. No incluye el capital financiado por la hipoteca (R$186.016) que se paga mes a mes.">
+    <div class="kpi hi" title="Todo el dinero desembolsado en efectivo para adquirir, escriturar, reformar y poner en marcha el apartamento. No incluye el capital financiado por la hipoteca (R$186.066) que se paga mes a mes.">
       <div class="kpi-lbl">Cash out total neto</div><div class="kpi-val g">R$245.5k</div><div class="kpi-sub">Capital propio desembolsado</div>
     </div>
     <div class="kpi" title="El FGTS (Fondo de Garantia por Tiempo de Servicio) son fondos laborales brasilenoa aplicados como amortizacion anticipada de la hipoteca Caixa en enero 2022, reduciendo el saldo inicial.">
       <div class="kpi-lbl">Reforma apartamento</div><div class="kpi-val w">R$125.6k</div><div class="kpi-sub">51% del cash out - intencionada</div>
     </div>
-    <div class="kpi" title="Saldo pendiente de la hipoteca Caixa Economica a julio 2026. TIN 7.16%, TAE 7.3997%, 20 anos (ago-2023 a ~ago-2040). La correccion monetaria IPCA ralentiza la amortizacion.">
+    <div class="kpi" title="Saldo pendiente de la hipoteca Caixa Economica segun el Excel. TIN 7.16%, TAE 7.3997% (valores del contrato), 240 cuotas (ago-2023 a jul-2043). La correccion monetaria (Poupanca/FGTS, tipo TR) sube el saldo cada mes y ralentiza la amortizacion real.">
       <div class="kpi-lbl">Saldo hipoteca (jul-26)</div><div class="kpi-val w">R$178.2k</div><div class="kpi-sub">TIN 7.16% - TAE 7.40% - 20 anos</div>
     </div>
-    <div class="kpi" title="Flujo neto operativo acumulado (feb-2024 a jul-2026): ingresos menos cuota hipoteca (que incluye la CM dentro, reduciendo la amortizacion real) menos gastos operativos. No descuenta el cash out inicial.">
+    <div class="kpi" title="Flujo neto operativo acumulado (feb-2024 a jul-2026): ingresos menos coste de la hipoteca (intereses + amortizacion + seguro + tasas) menos gastos operativos. La CM no se paga en la cuota. No descuenta el cash out inicial.">
       <div class="kpi-lbl">Flujo neto acum. operativo</div><div class="kpi-val g">R$77.7k</div><div class="kpi-sub">Feb-2024 a Jul-2026</div>
     </div>
   </div>
   <div class="g21" style="margin-bottom:12px">
     <div class="card">
-      <div class="card-hdr"><div><div class="card-title">Estructura del cash out</div><div class="card-sub">Desglose de los R$245.519 desembolsados</div></div></div>
+      <div class="card-hdr"><div><div class="card-title">Estructura del cash out</div><div class="card-sub">Desglose de los R$245.453 desembolsados</div></div></div>
       <div class="chart-wrap" style="height:250px"><canvas id="cashoutChart"></canvas></div>
-      <p class="note">La reforma (R$125.620, 51%) es la mayor partida, intencionada para subir precio y calidad. La hipoteca (R$186.016) no aparece aqui: es deuda que se paga mes a mes.</p>
+      <p class="note">La reforma (R$125.620, 51%) es la mayor partida, intencionada para subir precio y calidad. La hipoteca (R$186.066) no aparece aqui: es deuda que se paga mes a mes.</p>
     </div>
     <div class="card">
       <div class="card-hdr"><div><div class="card-title">Detalle de partidas</div><div class="card-sub">Toda la inversion inicial</div></div></div>
@@ -430,7 +430,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
   </div>
   <div class="card">
     <div class="card-hdr">
-      <div><div class="card-title">Flujo neto mensual real</div><div class="card-sub">Ingresos Airbnb menos cuota hipoteca (CM ya incluida dentro) menos gastos operativos. Verde = positivo, rojo = negativo.</div></div>
+      <div><div class="card-title">Flujo neto mensual real</div><div class="card-sub">Ingresos Airbnb menos coste de la hipoteca (intereses + amortizacion + seguro + tasas) menos gastos operativos. Verde = positivo, rojo = negativo.</div></div>
       <div><div class="card-stat">R$77.7k</div><div class="card-stat-lbl">Acumulado feb-24 a jul-26</div></div>
     </div>
     <div class="chart-wrap" style="height:250px"><canvas id="flujoNetoChart"></canvas></div>
@@ -462,25 +462,25 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div class="metric-how">Como interpretar: el benchmark para inmuebles en alquiler en SP es 6-10%. El 22.6% refleja el sobrerendimiento del short-term rental de calidad en zona prime.</div>
     </div>
 
-    <div class="metric-card" title="Rentabilidad neta real incluyendo hipoteca y correccion monetaria">
+    <div class="metric-card" title="Rentabilidad neta real incluyendo el coste de la hipoteca (la correccion monetaria no se paga en la cuota)">
       <div class="metric-name">Yield neto real (con hipoteca)</div>
       <div class="metric-val" style="color:#4ade80">14.2%</div>
-      <div class="metric-desc">Flujo neto real 2025 (R$73.185 - R$20.162 cuota hipoteca - R$18.936 gastos = R$34.087) sobre precio de compra. La cuota ya incluye la CM dentro; no se descuenta por separado. Mide la caja generada despues de todos los pagos corrientes.</div>
+      <div class="metric-desc">Flujo neto real 2025 (R$73.185 - R$20.162 cuota hipoteca - R$18.936 gastos = R$34.087) sobre precio de compra. La correccion monetaria no se paga en la cuota (sube el saldo de la deuda), por eso no se descuenta aqui. Mide la caja generada despues de todos los pagos corrientes.</div>
       <div class="metric-how">Como interpretar: el coste de la hipoteca reduce el yield del 22.6% al 12.9%. Sigue siendo muy superior al alquiler tradicional y a la renta fija brasilena (~12% SELIC 2025).</div>
     </div>
 
     <div class="metric-card" title="Cash-on-Cash Return: rendimiento sobre el dinero realmente puesto de tu bolsillo">
       <div class="metric-name">Cash-on-Cash Return</div>
       <div class="metric-val" style="color:#60a5fa">13.9%</div>
-      <div class="metric-desc">Flujo neto anual 2025 (R$34.088 = ingresos R$73.185 - cuota hipoteca R$20.162 - gastos op. R$18.936) dividido entre el cash out total neto (R$245.519). Mide cuanto rinde cada real que pusiste de tu bolsillo al ano.</div>
+      <div class="metric-desc">Flujo neto anual 2025 (R$34.088 = ingresos R$73.185 - cuota hipoteca R$20.162 - gastos op. R$18.936) dividido entre el cash out total neto (R$245.453). Mide cuanto rinde cada real que pusiste de tu bolsillo al ano.</div>
       <div class="metric-how">Como interpretar: es la metrica mas realista para inversores que usan apalancamiento. Un 12.6% anual sobre capital propio en un activo real con plusvalia es un resultado sobresaliente.</div>
     </div>
 
     <div class="metric-card" title="ROI acumulado sobre el capital total invertido">
-      <div class="metric-name">ROI acumulado (feb-24 a jul-26)</div>
-      <div class="metric-val" style="color:var(--accent)">31.7%</div>
-      <div class="metric-desc">Flujo neto acumulado (R$77.717) sobre cash out total neto (R$245.519). Retorno total generado en los 2.5 anos de operacion Airbnb, sin contar plusvalia del inmueble.</div>
-      <div class="metric-how">Como interpretar: ya has recuperado el 31.7% de lo invertido en caja. El resto viene via flujos futuros y plusvalia. El break-even del cash out se estima en 2032.</div>
+      <div class="metric-name">ROI acumulado (feb-24 a hoy)</div>
+      <div class="metric-val" style="color:var(--accent)" id="roiAcumVal">--</div>
+      <div class="metric-desc">Flujo neto acumulado (R$<span id="roiAcumFlujo">--</span>) sobre cash out total neto (R$245.453). Retorno total generado en los 2.5 anos de operacion Airbnb, sin contar plusvalia del inmueble.</div>
+      <div class="metric-how">Como interpretar: ya has recuperado el <span id="roiAcumPct">--</span> de lo invertido en caja. El resto viene via flujos futuros y plusvalia. El break-even del cash out (escenario realista) se estima en <strong id="beTxt">--</strong>.</div>
     </div>
 
     <div class="metric-card" title="ROI anualizado equivalente">
@@ -695,7 +695,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <span class="pill pn">Prioridad baja</span>
       </div>
       <div style="font-size:12px;color:var(--text2);line-height:1.6">
-        Con un flujo neto de ~R$34k/ano y gastos personales cubiertos, cualquier excedente aplicado a amortizacion anticipada tiene un retorno garantizado equivalente al TAE de la hipoteca (7.40% + IPCA). Dado que el saldo esta subiendo los primeros anos por la correccion monetaria, una amortizacion de R$20.000-30.000 en un momento de IPCA alto puede tener un impacto desproporcionado en reducir el plazo efectivo. La ventana optima es cuando el SELIC esta alto y la rentabilidad de la renta fija compite con el TAE de la hipoteca.
+        Con un flujo neto de ~R$34k/ano y gastos personales cubiertos, cualquier excedente aplicado a amortizacion anticipada tiene un retorno garantizado equivalente al coste real de la deuda: el interes (TAE 7.40% del contrato) mas la correccion monetaria que se acumula sobre el saldo (ver KPI "TAE real con CM" en la pestana Hipoteca). Como la correccion monetaria sube el saldo cada mes, adelantar capital evita tambien esa parte. La ventana optima es cuando el SELIC esta alto y la rentabilidad de la renta fija compite con ese coste real; confirma antes con la Caixa las condiciones de amortizacion extraordinaria (reducir plazo o cuota).
       </div>
     </div>
 
@@ -720,7 +720,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div style="border-top:1px solid var(--border);padding-top:10px;grid-column:1/-1">
         <div style="font-size:11px;color:var(--text2);margin-bottom:4px">Potencial de ingresos anuales (estimado conservador)</div>
         <div style="font-family:var(--mono);font-size:1.8rem;color:var(--accent);font-weight:500">~R$98.000/ano</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:4px">Un incremento del +34% sobre 2025. El flujo neto pasaria de ~R$34k a ~R$59k anuales, mejorando el break-even del cash out de 2032 a ~2029.</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">Un incremento del +34% sobre 2025. El flujo neto pasaria de ~R$34k a ~R$59k anuales, adelantando varios anos el break-even del cash out.</div>
       </div>
     </div>
   </div>
@@ -853,7 +853,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <div class="kpi hi" title="Lo que te quedaria despues de pagar la comision de QuintoAndar (6%), los gastos de cartorio (~1.5%), el IRPF sobre la ganancia (15%) y cancelar la hipoteca pendiente (R$177.812). Ese es tu patrimonio neto real en el bolsillo si vendieras hoy.">
       <div class="kpi-lbl">Patrimonio neto si vendes hoy</div><div class="kpi-val g">~R$247k</div><div class="kpi-sub">Tras comision, impuesto e hipoteca</div>
     </div>
-    <div class="kpi" title="Cuando terminas de pagar la hipoteca en agosto de 2043, el inmueble vale aproximadamente R$776k (creciendo al 3%/ano). Tras pagar comision (6%), cartorio (1.5%) e IRPF (15% sobre ganho de ~R$248k), te quedaria un patrimonio neto de ~R$681k. Ese seria tu maximo patrimonio inmobiliario acumulado.">
+    <div class="kpi" title="Cuando terminas de pagar la hipoteca en julio de 2043, el inmueble vale aproximadamente R$776k (creciendo al 3%/ano). Tras pagar comision (6%), cartorio (1.5%) e IRPF (15% sobre ganho de ~R$248k), te quedaria un patrimonio neto de ~R$681k. Ese seria tu maximo patrimonio inmobiliario acumulado.">
       <div class="kpi-lbl">Patrimonio neto si vendes en 2043</div><div class="kpi-val g">~R$681k</div><div class="kpi-sub">Sin hipoteca, inmueble ~R$776k</div>
     </div>
   </div>
@@ -878,7 +878,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
             <th title="Lo que ingresas despues de pagar la comision, cartorio e IRPF. Es el dinero que realmente recibes en tu cuenta.">Neto en mano</th>
             <th title="Saldo pendiente de la hipoteca Caixa en ese año. Lo tendrias que cancelar con parte del dinero de la venta.">Hipoteca</th>
             <th title="Lo que te queda realmente libre despues de pagar la hipoteca. Es tu patrimonio neto real de la operacion.">Patrimonio neto</th>
-            <th title="Cuanto ganas respecto al total que has invertido en efectivo: R$245.519. Es el retorno real total de toda la inversion.">ROI vs cash out</th>
+            <th title="Cuanto ganas respecto al total que has invertido en efectivo: R$245.453. Es el retorno real total de toda la inversion.">ROI vs cash out</th>
           </tr>
         </thead>
         <tbody id="ganhoTableBody"></tbody>
@@ -897,7 +897,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
         <tr title="El ITBI (Impuesto sobre Transmision de Bienes Inmuebles) que pagaste al comprar es un gasto de adquisicion y aumenta el custo base."><td style="color:var(--text)">ITBI pagado en la compra</td><td class="num">R$10.800</td><td><span class="pill pg">SI</span></td><td>Recibo ITBI o escritura</td></tr>
         <tr title="Los gastos de escritura y registro en el cartorio al comprar el inmueble. Neto de la devolucion de R$800."><td style="color:var(--text)">Escritura y registro (neto)</td><td class="num">R$10.000</td><td><span class="pill pg">SI</span></td><td>Recibos del cartorio</td></tr>
         <tr title="Los honorarios de gestora, inmobiliaria y asesoria pagados en la compra, si tienen nota fiscal o recibo formal. Sin documentacion, no son deducibles."><td style="color:var(--text)">Gestora + Inmob. + Asesoria (compra)</td><td class="num">R$35.000</td><td><span class="pill pw">SI si hay NF</span></td><td>Recibos o notas fiscais</td></tr>
-        <tr title="El FGTS usado para amortizar la hipoteca en enero 2022 no forma parte del custo de adquisicion del inmueble. Es un pago financiero, no un coste de la propiedad."><td style="color:var(--text)">FGTS (amort. hipoteca)</td><td class="num">R$5.984</td><td><span class="pill pd">NO</span></td><td>No es coste del inmueble</td></tr>
+        <tr title="El FGTS usado para amortizar la hipoteca en enero 2022 no forma parte del custo de adquisicion del inmueble. Es un pago financiero, no un coste de la propiedad."><td style="color:var(--text)">FGTS (amort. hipoteca)</td><td class="num">R$5.918</td><td><span class="pill pd">NO</span></td><td>No es coste del inmueble</td></tr>
         <tr style="border-top:1px solid var(--border)"><td style="color:var(--text);font-weight:500">TOTAL CUSTO DE AQUISICAO</td><td class="num" style="color:var(--accent)">R$358.610</td><td><span class="pill pg">Maximo legal</span></td><td>Con toda la documentacion</td></tr>
       </tbody>
     </table>
@@ -906,75 +906,79 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 
 <!-- ═══ HIPOTECA ═══ -->
 <section class="section" id="hipoteca">
-  <div class="sec-hdr"><span class="sec-title">Hipoteca Caixa Economica · Tabla de amortizacion</span><div class="sec-line"></div><span class="sec-note">TIN 7.16% · TAE 7.40% · 20 anos</span></div>
+  <div class="sec-hdr"><span class="sec-title">Hipoteca Caixa Economica · Tabla de amortizacion</span><div class="sec-line"></div><span class="sec-note">TIN 7.16% · TAE 7.40% (contrato) · 240 cuotas</span></div>
 
   <div class="kpi-grid" style="margin-bottom:12px">
-    <div class="kpi hi" title="Capital financiado por Caixa Economica Federal para la compra del inmueble. El FGTS amorto R$5.984 adicionales en enero 2022.">
-      <div class="kpi-lbl">Capital financiado</div><div class="kpi-val g">R$186.016</div><div class="kpi-sub">Caixa Economica Federal</div>
+    <div class="kpi hi" title="Capital financiado por Caixa Economica Federal para la compra del inmueble. El FGTS amorto R$5.918 adicionales en enero 2022.">
+      <div class="kpi-lbl">Capital financiado</div><div class="kpi-val g">R$186.066</div><div class="kpi-sub">Caixa Economica Federal</div>
     </div>
-    <div class="kpi" title="Tipo de interes nominal anual. El tipo efectivo real (TAE) es 7.3997% incluyendo costes asociados. La hipoteca ademas esta indexada al IPCA (inflacion brasilena), lo que eleva el coste real.">
-      <div class="kpi-lbl">TIN / TAE</div><div class="kpi-val">7.16% / 7.40%</div><div class="kpi-sub">+ indexacion IPCA</div>
+    <div class="kpi" title="Valores del contrato con la Caixa. TIN 7.16% = tipo nominal anual. TAE 7.3997% = ese mismo tipo expresado como tasa efectiva anual (capitalizando los intereses mensuales); NO incluye la correccion monetaria, que se aplica aparte sobre el saldo.">
+      <div class="kpi-lbl">TIN / TAE (contrato)</div><div class="kpi-val">7.16% / 7.40%</div><div class="kpi-sub">Sin correccion monetaria</div>
     </div>
-    <div class="kpi" title="Saldo real pendiente a julio 2026 segun el Excel. La correccion monetaria IPCA (acumulada ~4.5-5% anual) ha compensado parte de la amortizacion, por eso el saldo ha bajado menos de lo esperado en los primeros anos.">
-      <div class="kpi-lbl">Saldo actual (dic-26)</div><div class="kpi-val w">R$177.8k</div><div class="kpi-sub">Tras 41 meses de cuotas (dato real)</div>
+    <div class="kpi" title="Nota informativa: coste anual real de la deuda incluyendo la correccion monetaria. Se calcula como ((1 + TIN/12) x (1 + CM mensual))^12 - 1, con la CM media de los ultimos 3 meses reales del Excel. La CM es variable (indexador Poupanca/FGTS, tipo TR), asi que este valor cambia cada mes y no es el del contrato. Referencia: financiacion bancaria SBPE en Brasil ronda tasas nominales de dos digitos mas TR; tu 7.16% es de linea FGTS, bastante mas barata.">
+      <div class="kpi-lbl">TAE real con correccion monetaria</div><div class="kpi-val w" id="hipTaeReal">--</div><div class="kpi-sub">CM <span id="hipCmTxt">--</span> · variable · informativo</div>
     </div>
-    <div class="kpi" title="La hipoteca tiene exactamente 240 meses: agosto 2023 a agosto 2043. Con IPCA al 4.5%, el saldo sube ligeramente los primeros anos (porque la CM supera la amortizacion bruta) y empieza a bajar de forma visible desde ~2030. Con IPCA mas alto el proceso se ralentiza pero el plazo maximo es siempre agosto 2043.">
-      <div class="kpi-lbl">Fin estimado</div><div class="kpi-val">Ago 2043</div><div class="kpi-sub">20 anos exactos desde ago-2023</div>
+    <div class="kpi" title="Saldo pendiente del ultimo mes real del Excel. La correccion monetaria (~2% anual) se suma al saldo cada mes y compensa parte de la amortizacion, por eso el saldo baja mucho menos de lo que sugiere la columna de amortizacion de la cuota.">
+      <div class="kpi-lbl" id="hipSaldoActLbl">Saldo actual</div><div class="kpi-val w" id="hipSaldoAct">--</div><div class="kpi-sub" id="hipSaldoActSub">--</div>
     </div>
-    <div class="kpi" title="La cuota mensual fija es ~R$1.556 (promedio 2026): intereses + amortizacion bruta + seguro (~R$38) + tasas (~R$25). La CM (R$250-300/mes) esta dentro de la amortizacion bruta y la reduce — no es un coste adicional. La cuota sube lentamente cada año por el incremento del seguro e indexacion de tasas.">
-      <div class="kpi-lbl">Cuota mensual (fija)</div><div class="kpi-val">~R$1.556</div><div class="kpi-sub">Int + amort + seguro + tasas (CM dentro)</div>
+    <div class="kpi" title="La hipoteca tiene 240 cuotas; la cuota 36 fue la de jul-2026, asi que la 1 fue ago-2023 y la 240 sera jul-2043. El plazo es fijo: si la correccion monetaria sube, el banco recalcula cada mes y la cuota crece, no se alarga el plazo.">
+      <div class="kpi-lbl">Fin estimado</div><div class="kpi-val" id="hipFinVal">Jul 2043</div><div class="kpi-sub">240 cuotas desde ago-2023</div>
     </div>
-    <div class="kpi" title="Total de intereses que pagarias durante toda la vida del prestamo, sin contar la correccion monetaria IPCA. Con la CM incluida, el coste financiero total real es considerablemente mayor.">
-      <div class="kpi-lbl">Intereses totales (estimado)</div><div class="kpi-val w">~R$213k</div><div class="kpi-sub">Solo intereses sin CM · 2023-2043</div>
+    <div class="kpi" title="Ultima cuota real del Excel: intereses + amortizacion + seguro (~R$38) + tasas (R$25). La correccion monetaria (~R$300/mes) NO esta dentro: se suma al saldo de la deuda aparte. La cuota no es fija: cada mes la Caixa la recalcula sobre el saldo actualizado y sube unos R$2-3 al mes (por eso suben tambien el interes y la amortizacion).">
+      <div class="kpi-lbl">Cuota mensual (sube cada mes)</div><div class="kpi-val" id="hipCuotaVal">--</div><div class="kpi-sub" id="hipCuotaSub">--</div>
+    </div>
+    <div class="kpi" title="Intereses (juros) pagados hasta hoy (Excel) mas los proyectados hasta la ultima cuota, con la CM media reciente. No incluye la correccion monetaria, que sube el saldo y se paga implicitamente al amortizar.">
+      <div class="kpi-lbl">Intereses totales (estimado)</div><div class="kpi-val w" id="hipIntTot">--</div><div class="kpi-sub">Solo intereses · real + proyeccion</div>
     </div>
   </div>
 
   <div class="card" style="margin-bottom:12px">
     <div class="card-hdr">
-      <div><div class="card-title">Evolucion del saldo hipotecario y estructura de cuota</div><div class="card-sub">Saldo pendiente y desglose de la cuota: intereses, amortizacion bruta y correccion monetaria IPCA (que se descuenta de la amortizacion, reduciendo el capital real que se cancela cada mes)</div></div>
+      <div><div class="card-title">Evolucion del saldo hipotecario y estructura de cuota</div><div class="card-sub">Saldo pendiente y desglose: intereses, amortizacion real (amortizacion de la cuota menos correccion monetaria) y correccion monetaria, que NO se paga en la cuota sino que sube el saldo</div></div>
     </div>
     <div class="chart-wrap" style="height:280px"><canvas id="hipotecaChart"></canvas></div>
     <div class="leg" style="margin-top:8px">
       <div class="leg-i"><div class="leg-dot" style="background:#f59e0b"></div>Saldo pendiente (eje derecho)</div>
       <div class="leg-i"><div class="leg-dot" style="background:#f87171"></div>Intereses (eje izquierdo)</div>
       <div class="leg-i"><div class="leg-dot" style="background:#b8f566"></div>Amortizacion real (eje izquierdo)</div>
-      <div class="leg-i"><div class="leg-dot" style="background:#60a5fa"></div>Correccion monetaria IPCA (eje izquierdo)</div>
+      <div class="leg-i"><div class="leg-dot" style="background:#60a5fa"></div>Correccion monetaria (eje izquierdo)</div>
     </div>
-    <p class="note">Los 4 años reales (2023-2026) muestran saldo descendiendo de R$185k a R$177k. Desde 2027, con IPCA 4.5%, la CM supera la amortizacion bruta → el saldo sube hasta ~2030. A partir de 2030 empieza a bajar de forma consistente y se liquida en agosto 2043. La cuota sube cada año (seguros + tasas indexados) pero el ritmo de amortizacion real de capital acelera notablemente desde 2035.</p>
+    <p class="note">Los anos reales muestran el saldo bajando de R$186k a R$178k. Con la mecanica de la Caixa (saldo = saldo anterior + CM - amortizacion; intereses sobre el saldo ya actualizado) y una CM de ~2% anual, el saldo no sube: baja cada vez mas deprisa y llega a cero con la cuota 240 (jul-2043). La cuota crece poco a poco porque se recalcula sobre un saldo actualizado. La CM es variable: cada vez que me pases el dato real del mes, la proyeccion se reajusta.</p>
   </div>
 
   <div class="card" style="margin-bottom:12px">
-    <div class="card-hdr"><div><div class="card-title">Tabla de amortizacion anual</div><div class="card-sub">Cuota anual fija = Intereses + Amort. bruta. Amort. real de capital = Amort. bruta - Corr. Mon. IPCA. Datos 2023-2026 reales del Excel, 2027+ proyectados con IPCA 4.5%.</div></div></div>
+    <div class="card-hdr"><div><div class="card-title">Tabla de amortizacion anual</div><div class="card-sub">Cuota anual = Intereses + Amortizacion + Seguro + Tasas. Amort. real de capital = Amortizacion de la cuota - Corr. Mon. Reales del Excel hasta el ultimo mes con dato, despues proyeccion con la mecanica Caixa y la CM media reciente.</div></div></div>
     <div style="overflow-x:auto">
       <table class="tbl" id="amortTable">
-        <thead><tr><th>Ano</th><th>Cuota anual</th><th>Intereses</th><th>Amort. capital</th><th>Corr. Mon. IPCA</th><th>Saldo fin</th><th>Estado</th></tr></thead>
+        <thead><tr><th>Ano</th><th>Cuota anual</th><th>Intereses</th><th>Amort. capital</th><th>Corr. Monetaria</th><th>Saldo fin</th><th>Estado</th></tr></thead>
         <tbody id="amortBody"></tbody>
       </table>
     </div>
-    <p class="note">La CM reduce la amort. real (Amort. real = Amort. bruta - CM). Datos 2023-2026 son reales del Excel (12 meses completos en 2026 = R$18.667 cuota anual). Los anos con amort. negativa (2027-2029) el saldo sube porque la CM supera la amort. bruta. El saldo empieza a bajar de forma consistente en 2030 y se liquida en agosto 2043.</p>
+    <p class="note">La CM reduce la amort. real (Amort. real = Amortizacion de la cuota - CM): hoy solo ~1/3 de la amortizacion nominal baja de verdad la deuda. Los anos marcados "Real+Proy." mezclan meses reales del Excel con meses proyectados. El saldo llega a cero con la cuota 240 (jul-2043).</p>
   </div>
 
   <div class="card">
     <div class="card-hdr">
-      <div><div class="card-title">Escenarios de fin de hipoteca segun IPCA</div><div class="card-sub">La correccion monetaria es la variable critica: a mayor inflacion, mas tarda en pagarse</div></div>
+      <div><div class="card-title">Escenarios de correccion monetaria</div><div class="card-sub">El plazo es fijo (240 cuotas): la CM no alarga la hipoteca, cambia cuanto cuesta cada cuota y cuanto baja la deuda</div></div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:4px">
       <div class="metric-card">
-        <div class="metric-name">IPCA controlado (3-4%)</div>
-        <div class="metric-val" style="color:var(--accent)">~2038-2040</div>
-        <div class="metric-desc">Si el Banco Central mantiene la inflacion bajo control, la hipoteca se liquidaria en torno a 2038-2040, liberando ~R$1.570/mes de flujo neto adicional. El SALDO sigue subiendo los primeros anos con IPCA 4.5% — la hipoteca siempre termina en agosto 2043 independientemente del IPCA (es el contrato a 240 meses).</div>
+        <div class="metric-name">CM baja (−25%)</div>
+        <div class="metric-val" style="color:var(--accent)" id="cmEscOptim">--</div>
+        <div class="metric-desc">Si el indexador (Poupanca/FGTS, tipo TR) se mantiene bajo, el saldo se actualiza menos, el interes baja y la cuota crece menos.</div>
       </div>
       <div class="metric-card">
-        <div class="metric-name">IPCA moderado (4-5%)</div>
-        <div class="metric-val" style="color:#60a5fa">~2040-2042</div>
-        <div class="metric-desc">Escenario base historico para Brasil. La hipoteca termina entre 2040 y 2042. La CM reduce la amortizacion real pero no aumenta la cuota: cada punto de IPCA extra anade ~6-8 meses al plazo.</div>
+        <div class="metric-name">CM actual (media 3 meses)</div>
+        <div class="metric-val" style="color:#60a5fa" id="cmEscBase">--</div>
+        <div class="metric-desc">Escenario base de este dashboard: se mantiene la CM media de los ultimos meses reales. Es variable, asi que es una suposicion, no una prevision.</div>
       </div>
       <div class="metric-card">
-        <div class="metric-name">IPCA alto (6-8%)</div>
-        <div class="metric-val" style="color:var(--warn)">Ago 2043</div>
-        <div class="metric-desc">El plazo no se extiende — sigue siendo agosto 2043. Pero con IPCA alto la CM supera la amortizacion real durante mas anos, el saldo sube mas y cae mas tarde. Las ultimas cuotas seran significativamente mayores para liquidar el saldo pendiente.</div>
+        <div class="metric-name">CM alta (+50%)</div>
+        <div class="metric-val" style="color:var(--warn)" id="cmEscCons">--</div>
+        <div class="metric-desc">Si el indexador sube, la Caixa recalcula sobre un saldo mayor: la cuota mensual sube mas y la amortizacion real baja. La hipoteca sigue acabando con la cuota 240.</div>
       </div>
     </div>
+    <p class="note">Cifras de cada escenario: cuota mensual media estimada en 2030 y 2040 y total de intereses futuros. Calculado con la mecanica de la Caixa (contrato, clausulas 6.3 y 9). [Suposicion] sobre la CM futura: no existe garantia de que se mantenga.</p>
   </div>
 </section>
 
@@ -988,17 +992,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <button class="tab" onclick="setScenario('cons',this)">Pesimista</button>
   </div>
 
-  <div id="scenarioBadge" class="scenario-badge sb-base">Escenario Realista: crecimiento de precio +4%/ano · ocupacion 72% · IPCA 4.5%</div>
+  <div id="scenarioBadge" class="scenario-badge sb-base">Escenario Realista: crecimiento de precio +4%/ano · ocupacion 72% · CM = media real reciente</div>
 
   <div class="kpi-grid" style="margin-bottom:12px" id="projKPIs">
     <div class="kpi hi">
-      <div class="kpi-lbl">Break-even cash out</div><div class="kpi-val g" id="pkBE">2032</div><div class="kpi-sub" id="pkBESub">Cuando el flujo acum. supera R$245.519</div>
+      <div class="kpi-lbl">Break-even cash out</div><div class="kpi-val g" id="pkBE">2032</div><div class="kpi-sub" id="pkBESub">Cuando el flujo acum. supera R$245.453</div>
     </div>
     <div class="kpi">
       <div class="kpi-lbl">Flujo neto anual en 2030</div><div class="kpi-val" id="pk2030">R$35.6k</div><div class="kpi-sub">Con hipoteca activa</div>
     </div>
     <div class="kpi">
-      <div class="kpi-lbl">Flujo neto anual en 2040</div><div class="kpi-val" id="pk2040">R$79.2k</div><div class="kpi-sub">Sin hipoteca desde ~2040</div>
+      <div class="kpi-lbl">Flujo neto anual en 2044</div><div class="kpi-val" id="pk2040">--</div><div class="kpi-sub">Sin hipoteca (acaba jul-2043)</div>
     </div>
     <div class="kpi hi">
       <div class="kpi-lbl">Flujo acum. a 2046</div><div class="kpi-val g" id="pk2046">R$1.264k</div><div class="kpi-sub">Sobre R$245.5k invertidos</div>
@@ -1012,14 +1016,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <div class="chart-wrap" style="height:300px"><canvas id="projStackedChart"></canvas></div>
     <div class="leg" style="margin-top:8px">
       <div class="leg-i"><div class="leg-dot" style="background:#b8f566"></div>Ingresos Airbnb</div>
-      <div class="leg-i"><div class="leg-dot" style="background:#f87171"></div>Hipoteca + CM IPCA</div>
+      <div class="leg-i"><div class="leg-dot" style="background:#f87171"></div>Cuota hipoteca (intereses + amort. + seguro + tasas)</div>
       <div class="leg-i"><div class="leg-dot" style="background:#f59e0b"></div>Gastos operativos</div>
     </div>
   </div>
 
   <div class="card" style="margin-bottom:12px">
     <div class="card-hdr">
-      <div><div class="card-title">Flujo neto acumulado - 3 escenarios (2027-2046)</div><div class="card-sub">La linea de puntos marca el cash out total (R$245.519). La interseccion = break-even de la inversion.</div></div>
+      <div><div class="card-title">Flujo neto acumulado - 3 escenarios (2027-2046)</div><div class="card-sub">La linea de puntos marca el cash out total (R$245.453). La interseccion = break-even de la inversion.</div></div>
     </div>
     <div class="chart-wrap" style="height:280px"><canvas id="projCumChart"></canvas></div>
     <div class="leg" style="margin-top:8px">
@@ -1034,28 +1038,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div style="margin-bottom:8px"><span class="scenario-badge sb-optim" style="display:inline-block">Optimista</span></div>
       <div class="metric-name" style="font-size:13px;margin-bottom:8px">Consideraciones</div>
       <div class="metric-desc">
-        Precio/noche crece +7%/ano (R$290 -> R$560 en 2046). Ocupacion estable al 80%. IPCA controlado al 3.5%. La hipoteca termina ~2038 por menor efecto CM. Airbnb mantiene su posicion en Pinheiros sin nueva regulacion restrictiva. Mejoras incrementales en la propiedad sostienen precios premium.
+        Precio/noche crece +7%/ano (R$290 -> R$560 en 2046). Ocupacion estable al 80%. Correccion monetaria 25% por debajo de la media actual (cuota algo menor). La hipoteca termina igual con la cuota 240 (jul-2043). Airbnb mantiene su posicion en Pinheiros sin nueva regulacion restrictiva. Mejoras incrementales en la propiedad sostienen precios premium.
       </div>
       <div class="divider"></div>
-      <div class="metric-how">Break-even: <strong>2030</strong>. Flujo acum. 2046: <strong>+R$2.534k</strong>. ROI total: <strong>+1033%</strong></div>
+      <div class="metric-how" id="sc_optim">--</div>
     </div>
     <div class="card">
       <div style="margin-bottom:8px"><span class="scenario-badge sb-base" style="display:inline-block">Realista</span></div>
       <div class="metric-name" style="font-size:13px;margin-bottom:8px">Consideraciones</div>
       <div class="metric-desc">
-        Precio/noche crece +4%/ano (R$290 -> R$462 en 2046). Ocupacion al 72% (ligeramente por debajo de la media actual). IPCA al 4.5% historico. Hipoteca termina ~2040. Competencia Airbnb moderada en la zona. Mantenimiento y mejoras periodicas sostenidas.
+        Precio/noche crece +4%/ano (R$290 -> R$462 en 2046). Ocupacion al 72% (ligeramente por debajo de la media actual). Correccion monetaria igual a la media real reciente. Hipoteca termina con la cuota 240 (jul-2043). Competencia Airbnb moderada en la zona. Mantenimiento y mejoras periodicas sostenidas.
       </div>
       <div class="divider"></div>
-      <div class="metric-how">Break-even: <strong>2032</strong>. Flujo acum. 2046: <strong>+R$1.264k</strong>. ROI total: <strong>+415%</strong></div>
+      <div class="metric-how" id="sc_base">--</div>
     </div>
     <div class="card">
       <div style="margin-bottom:8px"><span class="scenario-badge sb-cons" style="display:inline-block">Pesimista</span></div>
       <div class="metric-name" style="font-size:13px;margin-bottom:8px">Consideraciones</div>
       <div class="metric-desc">
-        Precio/noche crece solo +1%/ano (inflacion minima). Ocupacion cae al 60% por mayor competencia o regulacion. IPCA alto al 6.5% encarece la hipoteca y erosiona margenes. Los gastos operativos suben con la inflacion pero los ingresos no. El flujo neto se vuelve negativo desde 2037.
+        Precio/noche crece solo +1%/ano (inflacion minima). Ocupacion cae al 60% por mayor competencia o regulacion. Correccion monetaria 50% por encima de la media actual (cuota mas alta). Los gastos operativos suben con la inflacion pero los ingresos no, y erosiona margenes.
       </div>
       <div class="divider"></div>
-      <div class="metric-how">Break-even: <strong>No alcanzado</strong> con solo flujos. Flujo acum. 2046: <strong>~R$113k</strong>. El inmueble vale mas vendido.</div>
+      <div class="metric-how" id="sc_cons">--</div>
     </div>
   </div>
 
@@ -1090,11 +1094,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
     <div class="chart-wrap" style="height:260px"><canvas id="revalChart"></canvas></div>
     <div class="leg" style="margin-top:8px">
       <div class="leg-i"><div class="leg-dot" style="background:#b8f566"></div>Optimista: +5%/ano (zona prime, alta demanda)</div>
-      <div class="leg-i"><div class="leg-dot" style="background:#60a5fa"></div>Realista: +3%/ano (IPCA + leve crecimiento real)</div>
+      <div class="leg-i"><div class="leg-dot" style="background:#60a5fa"></div>Realista: +3%/ano</div>
       <div class="leg-i"><div class="leg-dot" style="background:#f87171"></div>Conservador: +1.5%/ano (solo inflacion parcial)</div>
       <div class="leg-i"><div class="leg-dot" style="background:#f59e0b;opacity:.6"></div>Saldo hipoteca pendiente</div>
     </div>
-    <p class="note">La linea naranja discontinua es la hipoteca pendiente — la "deuda" sobre el activo. El espacio entre cada curva de valor y la hipoteca es lo que es tuyo (equity). En los 3 escenarios, ese espacio crece cada ano porque el inmueble se revaloriza mientras la hipoteca baja. En agosto 2043 la hipoteca llega a cero y el 100% del valor del piso es tuyo.</p>
+    <p class="note">La linea naranja discontinua es la hipoteca pendiente — la "deuda" sobre el activo. El espacio entre cada curva de valor y la hipoteca es lo que es tuyo (equity). En los 3 escenarios, ese espacio crece cada ano porque el inmueble se revaloriza mientras la hipoteca baja. Con la cuota 240 (jul-2043) la hipoteca llega a cero y el 100% del valor del piso es tuyo.</p>
   </div>
 
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:12px">
@@ -1102,24 +1106,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
       <div class="metric-name">Optimista (+5%/ano)</div>
       <div class="metric-val" style="color:var(--accent)">~R$1.247k en 2046</div>
       <div class="metric-desc">Pinheiros / Benedito Calixto es zona prime con oferta limitada de suelo, alta demanda de nomadas digitales y turismo premium, y consolidacion de Faria Lima como hub financiero. Si Sao Paulo mantiene traccion internacional, +5%/ano real es alcanzable. Historicamente Vila Madalena y Pinheiros han tenido periodos de +8-10%/ano.</div>
-      <div class="metric-how">Valor 2043: ~R$1.077k. Equity sin hipoteca: ~R$1.077k. Con flujos Airbnb acum. ~R$979k = patrimonio total ~R$2.0M</div>
+      <div class="metric-how">Valor 2043: ~R$1.077k. Equity sin hipoteca: ~R$1.077k. Con flujos Airbnb acum. (realista) ~R$<span class="rvA">--</span>k = patrimonio total ~R$<span id="rvTotO">--</span></div>
     </div>
     <div class="metric-card">
       <div class="metric-name">Realista (+3%/ano)</div>
       <div class="metric-val" style="color:#60a5fa">~R$849k en 2046</div>
       <div class="metric-desc">Crecimiento real moderado, alineado con el historico de largo plazo de inmuebles en zonas consolidadas de Sao Paulo (+3-4% real anual). Contempla cierta presion de oferta nueva en Pinheiros pero demanda sostenida. Es el escenario mas probable segun datos de FipeZap y AirROI para zona prime SP.</div>
-      <div class="metric-how">Valor 2043: ~R$777k. Equity sin hipoteca: ~R$777k. Con flujos Airbnb acum. ~R$979k = patrimonio total ~R$1.76M</div>
+      <div class="metric-how">Valor 2043: ~R$777k. Equity sin hipoteca: ~R$777k. Con flujos Airbnb acum. (realista) ~R$<span class="rvA">--</span>k = patrimonio total ~R$<span id="rvTotB">--</span></div>
     </div>
     <div class="metric-card">
       <div class="metric-name">Pesimista (+1.5%/ano)</div>
       <div class="metric-val" style="color:var(--danger)">~R$633k en 2046</div>
       <div class="metric-desc">Crecimiento apenas por encima de la inflacion. Contempla exceso de oferta de studios en Pinheiros, posible regulacion restrictiva del alquiler turistico en SP (como ocurrio en Barcelona o Paris), o un deterioro macro de Brasil. Incluso en este escenario el inmueble sigue valiendo mas del doble que el cash out total invertido.</div>
-      <div class="metric-how">Valor 2043: ~R$605k. Equity sin hipoteca: ~R$605k. Con flujos Airbnb acum. ~R$979k = patrimonio total ~R$1.58M</div>
+      <div class="metric-how">Valor 2043: ~R$605k. Equity sin hipoteca: ~R$605k. Con flujos Airbnb acum. (realista) ~R$<span class="rvA">--</span>k = patrimonio total ~R$<span id="rvTotC">--</span></div>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-hdr"><div><div class="card-title">Retorno total estimado acumulado (flujos + plusvalia)</div><div class="card-sub">Combinacion del flujo neto Airbnb acumulado mas la plusvalia del inmueble sobre el cash out de R$245.519</div></div></div>
+    <div class="card-hdr"><div><div class="card-title">Retorno total estimado acumulado (flujos + plusvalia)</div><div class="card-sub">Combinacion del flujo neto Airbnb acumulado mas la plusvalia del inmueble sobre el cash out de R$245.453</div></div></div>
     <div class="chart-wrap" style="height:240px"><canvas id="retornoTotalChart"></canvas></div>
     <div class="leg" style="margin-top:8px">
       <div class="leg-i"><div class="leg-dot" style="background:#b8f566"></div>Flujo neto acum. (escenario realista Airbnb)</div>
@@ -1273,7 +1277,7 @@ function procesarYRenderizar(cache){
   window._upcoming=out.upcoming; window._scatter=out.scatter;
   window._breakdown=out.breakdown; window._porAño=out.porAño;
   window._amort=outInmob.amort; window._gastosPorAño=outInmob.gastosPorAño;
-  window._saldoHip=outInmob.saldoHip; window._totRes=out.totRes;
+  window._saldoHip=outInmob.saldoHip; window._estadoHip=outInmob.estado; window._totRes=out.totRes;
   window._minEntrada=out.minEntrada;
   actualizarBadges(out);
   renderCharts();
@@ -1404,7 +1408,8 @@ function procesarAirbnb(values){
 // procesarInmobiliario: hipoteca real (2023-2026) + gastos por año
 // ══════════════════════════════════════════════════════════════
 function procesarInmobiliario(values){
-  var out={amort:{},gastosPorAño:{},saldoHip:0};
+  var out={amort:{},gastosPorAño:{},saldoHip:0,estado:null};
+  var serieHip=[]; var ahora=Date.now();
   if(!values)return out;
   var headerRowIdx=-1, headerRow=null;
   for(var r=0;r<Math.min(values.length,10);r++){
@@ -1417,6 +1422,7 @@ function procesarInmobiliario(values){
   var cFecha=findCol(headerRow,'Fecha');
   var cHip=findCol(headerRow,'Hipoteca/Amortizacion');
   var cJuros=findCol(headerRow,'Juros');
+  var cEvObra=findCol(headerRow,'Ev. Obra/\nAmortización');
   var cCM=findCol(headerRow,'Corrección\nMonetaria');
   var cSaldo=findCol(headerRow,'Saldo\nDevedor');
   var cIng=findCol(headerRow,'Ingresos Airbnb');
@@ -1437,14 +1443,29 @@ function procesarInmobiliario(values){
     var y=d.getFullYear();
     var hip=cHip>=0?(parseFloat(row[cHip])||0):0;
     var juros=cJuros>=0?(parseFloat(row[cJuros])||0):0;
+    var ev=cEvObra>=0?(parseFloat(row[cEvObra])||0):0;
+    var seg=cSeguro>=0?(parseFloat(row[cSeguro])||0):0;
+    var tas=cTasas>=0?(parseFloat(row[cTasas])||0):0;
     var cm=cCM>=0?(parseFloat(row[cCM])||0):0;
     var saldo=cSaldo>=0?(parseFloat(row[cSaldo])||0):0;
     if(!out.amort[y])out.amort[y]={yr:y,cuota:0,int:0,amort:0,cm:0,saldo:0,real:true};
-    out.amort[y].cuota+=hip+juros;
-    out.amort[y].int+=juros;
-    out.amort[y].amort+=(hip-cm);
-    out.amort[y].cm+=cm;
-    if(saldo>0){out.amort[y].saldo=saldo;out.saldoHip=saldo;}
+    // Cuota = columna C (Hipoteca/Amortizacion), que YA es la suma Juros + Amortización
+    // nominal (Ev.Obra/Amortización) + Seguro + Tasas. Antes se hacía hip+juros (contaba
+    // los intereses dos veces) y amort = hip-cm (usaba la cuota entera como amortización).
+    // Amortización real = amortización nominal (E) - corrección monetaria (H), que es
+    // exactamente lo que baja el saldo (verificado mes a mes: saldo = saldo_ant + H - E).
+    // Solo meses con hipoteca activa (hip>0): antes (obra) E es evolución de obra, no hipoteca.
+    // Solo meses ya transcurridos (fecha <= hoy): los meses futuros del Excel son
+    // marcadores de posición, no pagos reales; el resto se proyecta con la mecánica Caixa.
+    var transcurrido=d.getTime()<=ahora;
+    if(hip>0&&transcurrido){
+      out.amort[y].cuota+=hip;
+      out.amort[y].int+=juros;
+      out.amort[y].amort+=(ev-cm);
+      out.amort[y].cm+=cm;
+      serieHip.push({t:d.getTime(),y:y,m:d.getMonth(),saldo:saldo,cm:cm,cuota:juros+ev+seg+tas,seg:seg,tas:tas});
+    }
+    if(saldo>0&&transcurrido){out.amort[y].saldo=saldo;out.saldoHip=saldo;}
 
     // Gasto operativo recurrente = solo estas partidas concretas (nunca "Otros",
     // que mezcla el desembolso inicial de compra/reforma con gasto del día a día).
@@ -1458,14 +1479,26 @@ function procesarInmobiliario(values){
                   (cNet>=0?(parseFloat(row[cNet])||0):0)+
                   (cLimp>=0?(parseFloat(row[cLimp])||0):0)+
                   (cManto>=0?(parseFloat(row[cManto])||0):0)+
-                  (cSeguro>=0?(parseFloat(row[cSeguro])||0):0)+
-                  (cTasas>=0?(parseFloat(row[cTasas])||0):0)+
                   (cWise>=0?(parseFloat(row[cWise])||0):0);
       out.gastosPorAño[y].ing+=ing;
-      out.gastosPorAño[y].hip+=(hip+juros);
+      // Hipoteca = D+E+F+G (como el Beneficio del Excel). Seguro y Tasas van aquí, no en gastoOp.
+      out.gastosPorAño[y].hip+=(juros+ev+seg+tas);
       out.gastosPorAño[y].gastoOp+=gastoOp;
     }
   });
+  // Estado de partida para la proyección: último mes real con saldo, nº de cuota
+  // (cuota 1 = ago-2023) y tasa de corrección monetaria mensual media de los
+  // últimos 3 meses (CM_t / saldo_{t-1}).
+  serieHip.sort(function(a,b){return a.t-b.t;});
+  var u=serieHip.length?serieHip[serieHip.length-1]:null;
+  if(u&&u.saldo>0){
+    var cs=[];
+    for(var k=Math.max(1,serieHip.length-3);k<serieHip.length;k++){
+      if(serieHip[k-1].saldo>0&&serieHip[k].cm>0)cs.push(serieHip[k].cm/serieHip[k-1].saldo);
+    }
+    var cmMes=cs.length?cs.reduce(function(a,b){return a+b;},0)/cs.length:0;
+    out.estado={n:(u.y-2023)*12+u.m-7+1,y:u.y,m:u.m,saldo:u.saldo,seguro:u.seg,tasas:u.tas,cuota:u.cuota,cmMes:cmMes,cmUlt:u.cm};
+  }
   return out;
 }
 
@@ -1825,15 +1858,15 @@ var cashoutItems=[
   {label:'Entrada a vista (constructora)',val:25000,tip:'Pago en efectivo en el momento de la compra.'},
   {label:'Evolucion de obra',val:18385,tip:'Pagos progresivos durante la construccion antes de la entrega.'},
   {label:'Coste asesoria',val:21250,tip:'Honorarios de asesoria legal, fiscal y de compra.'},
-  {label:'Entrada financiada (constructora)',val:23000,tip:'Tramo financiado directamente con la constructora.'},
+  {label:'Entrada financiada (constructora)',val:23000,tip:'Tramo financiado a corto plazo por la constructora; pagado en cuotas de interes (2021) y amortizado en nov-dic 2021: dinero propio.'},
   {label:'Escritura (4.5% ITP)',val:10800,tip:'Escritura e impuesto de transmisiones. Se devolvieron R$800 despues.'},
   {label:'Coste gestora',val:9488,tip:'Honorarios de gestoria.'},
-  {label:'FGTS (amort. anticipada)',val:5984,tip:'Fondos FGTS aplicados como amortizacion anticipada en enero 2022.'},
+  {label:'FGTS (amort. anticipada)',val:5918.46,tip:'Fondos FGTS aplicados como amortizacion anticipada en enero 2022.'},
   {label:'Coste financiacion',val:2530,tip:'Costes de tramitacion de la hipoteca Caixa Economica.'},
   {label:'Coste inmobiliaria',val:4263,tip:'Honorarios de agencia inmobiliaria.'},
   {label:'Devolucion escritura',val:-800,tip:'Importe devuelto del coste de escritura.'}
 ];
-var cashoutTotal=245519;
+var cashoutTotal=245453; // 245.519 anterior − 65,54 (FGTS 5.984 → 5.918,46 según contrato)
 new Chart(document.getElementById('cashoutChart'), {
   type:'bar',
   data:{
@@ -1860,8 +1893,8 @@ if (invTbody) {
     var col=item.val<0?'color:var(--accent)':'';
     invTbody.innerHTML+='<tr title="'+item.tip+'"><td style="color:var(--text)">'+item.label+'</td><td class="num" style="'+col+'">R$'+Math.abs(item.val).toLocaleString('pt-BR')+'</td><td class="num" style="color:var(--text3);'+col+'">'+(item.val<0?'-':'')+pct+'%</td></tr>';
   });
-  invTbody.innerHTML+='<tr style="border-top:1px solid var(--border)"><td style="color:var(--text);font-weight:500">TOTAL CASH OUT NETO</td><td class="num" style="color:var(--accent)">R$245.519</td><td class="num" style="color:var(--accent)">100%</td></tr>';
-  invTbody.innerHTML+='<tr><td style="color:var(--text3);font-size:11px">+ Hipoteca Caixa (deuda)</td><td class="num" style="color:var(--text3);font-size:11px">R$186.016</td><td class="num" style="color:var(--text3);font-size:11px">deuda</td></tr>';
+  invTbody.innerHTML+='<tr style="border-top:1px solid var(--border)"><td style="color:var(--text);font-weight:500">TOTAL CASH OUT NETO</td><td class="num" style="color:var(--accent)">R$245.453</td><td class="num" style="color:var(--accent)">100%</td></tr>';
+  invTbody.innerHTML+='<tr><td style="color:var(--text3);font-size:11px">+ Hipoteca Caixa (deuda)</td><td class="num" style="color:var(--text3);font-size:11px">R$186.066</td><td class="num" style="color:var(--text3);font-size:11px">deuda</td></tr>';
 }
 
 // ── FLUJO NETO MENSUAL ──
@@ -1931,38 +1964,61 @@ new Chart(document.getElementById('comparativaChart'), {
 });
 
 // ── HIPOTECA ──
-// Años 2023-2026: datos REALES del Excel (window._amort). 2027-2043: proyección con IPCA 4.5%
-// (el saldo de partida se ajusta automáticamente al saldo real más reciente).
+// Años reales: Excel (window._amort, solo meses transcurridos). Resto: proyección con la
+// MECÁNICA REAL DE LA CAIXA (cláusulas 6.3 y 9 del contrato, verificada al céntimo con
+// los extractos del banco de ago/sep/oct-2026):
+//   saldo_actualizado = saldo_ant × (1 + CM)          (la CM NO va dentro de la cuota)
+//   A+J = PMT(7,16%/12, cuotas restantes, saldo_actualizado)   (Tabla PRICE recalculada cada mes)
+//   intereses = saldo_actualizado × 7,16%/12 ; amortización = (A+J) − intereses
+//   saldo_nuevo = saldo_actualizado − amortización
+//   cuota que sales a pagar = A+J + seguro + tasas
+// CM = Poupança/FGTS (tipo TR), VARIABLE: aquí se usa la media real de los últimos 3 meses.
+var HIP_N=240, HIP_I=0.0716/12;
+var estHip=window._estadoHip||{n:39,y:2026,m:9,saldo:177986,seguro:38.24,tasas:25,cuota:1585.74,cmMes:0.0017,cmUlt:301,fallback:true};
+var CM_MES=estHip.cmMes>0?estHip.cmMes:0.0017;
+function proyectarHipoteca(cmMes){
+  var S=estHip.saldo, y=estHip.y, m=estHip.m, rows={};
+  for(var j=estHip.n+1;j<=HIP_N;j++){
+    m++; if(m>11){m=0;y++;}
+    var Sx=S*(1+cmMes), nr=HIP_N-j+1;
+    var P=Sx*HIP_I/(1-Math.pow(1+HIP_I,-nr)), J=Sx*HIP_I, A=P-J;
+    var r=rows[y]||(rows[y]={yr:y,cuota:0,int:0,amortNom:0,cm:0,saldo:0,fin:0});
+    r.cuota+=P+estHip.seguro+estHip.tasas; r.int+=J; r.amortNom+=A; r.cm+=(Sx-S);
+    S=Sx-A; r.saldo=Math.max(0,S); r.fin=j;
+  }
+  return rows;
+}
 var amortReal=window._amort||{};
-var amortData=[2023,2024,2025,2026].map(function(y){
+var amortData=Object.keys(amortReal).map(Number).filter(function(y){return y>=2023;}).sort().map(function(y){
   var d=amortReal[y];
-  if(!d)return {yr:y,saldo:0,cuota:0,int:0,amort:0,cm:0,real:true};
   return {yr:y,saldo:Math.round(d.saldo),cuota:Math.round(d.cuota),int:Math.round(d.int),amort:Math.round(d.amort),cm:Math.round(d.cm),real:true};
 });
-var proyeccionFutura=[
-  {yr:2027,cuota:19601,int:12845,amort:-1936,cm:7882},
-  {yr:2028,cuota:20463,int:12964,amort:-1281,cm:7955},
-  {yr:2029,cuota:21363,int:13031,amort:-506,cm:7996},
-  {yr:2030,cuota:22303,int:13038,amort:406,cm:8001},
-  {yr:2031,cuota:23285,int:12975,amort:1473,cm:7962},
-  {yr:2032,cuota:24311,int:12829,amort:2716,cm:7872},
-  {yr:2033,cuota:25383,int:12588,amort:4160,cm:7724},
-  {yr:2034,cuota:26502,int:12235,amort:5830,cm:7508},
-  {yr:2035,cuota:27672,int:11754,amort:7756,cm:7213},
-  {yr:2036,cuota:28893,int:11126,amort:9973,cm:6827},
-  {yr:2037,cuota:30169,int:10327,amort:12518,cm:6337},
-  {yr:2038,cuota:31502,int:9334,amort:15434,cm:5728},
-  {yr:2039,cuota:32895,int:8118,amort:18770,cm:4981},
-  {yr:2040,cuota:34349,int:6646,amort:22578,cm:4078},
-  {yr:2041,cuota:35869,int:4884,amort:26920,cm:2997},
-  {yr:2042,cuota:37456,int:2791,amort:31864,cm:1712},
-  {yr:2043,cuota:22608,int:513,amort:21137,cm:315}
-];
-var saldoArranque=(amortData[amortData.length-1]||{}).saldo||177171;
-proyeccionFutura.forEach(function(d){
-  saldoArranque=saldoArranque-d.amort;
-  amortData.push({yr:d.yr,saldo:Math.max(0,Math.round(saldoArranque)),cuota:d.cuota,int:d.int,amort:d.amort,cm:d.cm,real:false});
+var proyHip=proyectarHipoteca(CM_MES);
+Object.keys(proyHip).map(Number).sort().forEach(function(y){
+  var p=proyHip[y], ex=null;
+  amortData.forEach(function(r){ if(r.yr===y)ex=r; });
+  if(ex){ ex.cuota+=Math.round(p.cuota); ex.int+=Math.round(p.int); ex.cm+=Math.round(p.cm); ex.amort+=Math.round(p.amortNom-p.cm); ex.saldo=Math.round(p.saldo); ex.real=false; ex.mix=true; }
+  else amortData.push({yr:y,saldo:Math.round(p.saldo),cuota:Math.round(p.cuota),int:Math.round(p.int),amort:Math.round(p.amortNom-p.cm),cm:Math.round(p.cm),real:false});
 });
+var MESES_ES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+(function(){
+  function set(id,txt){ var e=document.getElementById(id); if(e)e.textContent=txt; }
+  var fmt=function(v){return Math.round(v).toLocaleString('pt-BR');};
+  var intTot=0; amortData.forEach(function(d){intTot+=d.int;});
+  // mes de la última cuota: cuota 240 = jul-2043 (cuota 1 = ago-2023)
+  var finMes=(7+HIP_N-1)%12, finAnio=2023+Math.floor((7+HIP_N-1)/12);
+  window._hipFin=MESES_ES[finMes]+'-'+finAnio;
+  set('hipSaldoAct','R$'+fmt(estHip.saldo));
+  set('hipSaldoActLbl','Saldo actual ('+MESES_ES[estHip.m]+'-'+String(estHip.y).slice(2)+')');
+  set('hipSaldoActSub','Tras '+estHip.n+' cuotas (dato real'+(estHip.fallback?' · sin Excel: valor del banco':'')+')');
+  set('hipFinVal',MESES_ES[finMes].charAt(0).toUpperCase()+MESES_ES[finMes].slice(1)+' '+finAnio);
+  set('hipCuotaVal','~R$'+fmt(estHip.cuota));
+  set('hipCuotaSub','Int + amort + seguro + tasas · sube ~R$2,6/mes');
+  set('hipIntTot','~R$'+Math.round(intTot/1000)+'k');
+  set('hipCmTxt',(CM_MES*100).toFixed(2).replace('.',',')+'%/mes (~'+(((Math.pow(1+CM_MES,12)-1)*100).toFixed(2)).replace('.',',')+'%/año)');
+  var tae=(Math.pow((1+HIP_I)*(1+CM_MES),12)-1)*100;
+  set('hipTaeReal','~'+tae.toFixed(1).replace('.',',')+'%');
+})();
 
 new Chart(document.getElementById('hipotecaChart'), {
   type:'bar',
@@ -1971,7 +2027,7 @@ new Chart(document.getElementById('hipotecaChart'), {
     datasets:[
       { label:'Intereses', data:amortData.map(function(d){ return d.int; }), backgroundColor:'#f87171', borderRadius:2, borderSkipped:false, yAxisID:'y' },
       { label:'Amort. real', data:amortData.map(function(d){ return Math.max(0,d.amort); }), backgroundColor:'#b8f566', borderRadius:2, borderSkipped:false, yAxisID:'y' },
-      { label:'CM IPCA', data:amortData.map(function(d){ return d.cm; }), backgroundColor:'#60a5fa', borderRadius:2, borderSkipped:false, yAxisID:'y' },
+      { label:'Corr. monetaria', data:amortData.map(function(d){ return d.cm; }), backgroundColor:'#60a5fa', borderRadius:2, borderSkipped:false, yAxisID:'y' },
       { label:'Saldo', data:amortData.map(function(d){ return d.saldo; }), type:'line', borderColor:'#f59e0b', borderWidth:2.5, fill:false, tension:0.25, pointRadius:3, pointHoverRadius:6, yAxisID:'y2' }
     ]
   },
@@ -1979,7 +2035,7 @@ new Chart(document.getElementById('hipotecaChart'), {
     responsive:true, maintainAspectRatio:false,
     plugins:{ legend:{display:false}, tooltip: makeTT(
       function(ctx){ return ' '+ctx.dataset.label+': R$'+Math.round(ctx.parsed.y).toLocaleString('pt-BR'); },
-      function(items){ var d=amortData[items[0]?items[0].dataIndex:0]; return ['','Cuota anual: R$'+d.cuota.toLocaleString('pt-BR'),d.amort<0?'Amort. real negativa: CM > amort. bruta (saldo sube)':'',d.real?'Dato real del Excel':'Proyeccion IPCA 4.5%']; }
+      function(items){ var d=amortData[items[0]?items[0].dataIndex:0]; return ['','Cuota anual: R$'+d.cuota.toLocaleString('pt-BR'),d.amort<0?'Amort. real negativa: CM > amort. bruta (saldo sube)':'',d.real?'Dato real del Excel':(d.mix?'Real hasta '+MESES_ES[estHip.m]+' + proyeccion':'Proyeccion con CM '+(CM_MES*100).toFixed(2)+'%/mes')]; }
     )},
     scales:{
       x:{ grid:{display:false}, ticks:{color:mutedC,font:{size:10,family:'DM Mono'}} },
@@ -1992,7 +2048,7 @@ new Chart(document.getElementById('hipotecaChart'), {
 var amortBody=document.getElementById('amortBody');
 if (amortBody) {
   amortData.forEach(function(d){
-    var pill=d.real?'<span class="pill pg">Real</span>':'<span class="pill pn">Proy.</span>';
+    var pill=d.real?'<span class="pill pg">Real</span>':(d.mix?'<span class="pill pw">Real+Proy.</span>':'<span class="pill pn">Proy.</span>');
     var amortColor=d.amort<0?'color:#f87171':d.amort>10000?'color:var(--accent)':'';
     var saldoColor=d.saldo<100000?'color:var(--accent)':d.saldo<150000?'color:#f59e0b':'';
     amortBody.innerHTML+='<tr><td style="color:var(--text)">'+d.yr+'</td><td class="num">R$'+d.cuota.toLocaleString('pt-BR')+'</td><td class="num" style="color:#f87171">R$'+d.int.toLocaleString('pt-BR')+'</td><td class="num" style="'+amortColor+'">'+(d.amort<0?'':'')+' R$'+d.amort.toLocaleString('pt-BR')+'</td><td class="num" style="color:#60a5fa">R$'+d.cm.toLocaleString('pt-BR')+'</td><td class="num" style="'+saldoColor+'">R$'+d.saldo.toLocaleString('pt-BR')+'</td><td>'+pill+'</td></tr>';
@@ -2005,9 +2061,28 @@ var PROJ={
   optim:[{yr:2027,ing:80040,op:22770,hip:19001,flujo:38269,acum:109553},{yr:2028,ing:85643,op:23567,hip:18305,flujo:43771,acum:153324},{yr:2029,ing:91638,op:24392,hip:17635,flujo:49611,acum:202935},{yr:2030,ing:98052,op:25246,hip:16989,flujo:55817,acum:258752},{yr:2031,ing:104916,op:26129,hip:16366,flujo:62421,acum:321173},{yr:2032,ing:112260,op:27044,hip:15767,flujo:69449,acum:390622},{yr:2033,ing:120118,op:27990,hip:15189,flujo:76939,acum:467561},{yr:2034,ing:128527,op:28970,hip:14632,flujo:84925,acum:552486},{yr:2035,ing:137524,op:29984,hip:14095,flujo:93445,acum:645931},{yr:2036,ing:147150,op:31033,hip:13579,flujo:102538,acum:748469},{yr:2037,ing:157451,op:32119,hip:13082,flujo:112250,acum:860719},{yr:2038,ing:168472,op:33244,hip:0,flujo:135228,acum:995947},{yr:2039,ing:180265,op:34407,hip:0,flujo:145858,acum:1141805},{yr:2040,ing:192884,op:35611,hip:0,flujo:157273,acum:1299078},{yr:2041,ing:206386,op:36858,hip:0,flujo:169528,acum:1468606},{yr:2042,ing:220833,op:38148,hip:0,flujo:182685,acum:1651291},{yr:2043,ing:236291,op:39483,hip:0,flujo:196808,acum:1848099},{yr:2044,ing:252832,op:40865,hip:0,flujo:211967,acum:2060066},{yr:2045,ing:270530,op:42295,hip:0,flujo:228235,acum:2288301},{yr:2046,ing:289467,op:43775,hip:0,flujo:245692,acum:2533993}],
   cons:[{yr:2027,ing:60030,op:23430,hip:24347,flujo:12253,acum:83537},{yr:2028,ing:60630,op:24953,hip:24185,flujo:11492,acum:95029},{yr:2029,ing:61237,op:26575,hip:24025,flujo:10637,acum:105666},{yr:2030,ing:61849,op:28302,hip:23865,flujo:9682,acum:115348},{yr:2031,ing:62467,op:30142,hip:23706,flujo:8619,acum:123967},{yr:2032,ing:63092,op:32101,hip:23550,flujo:7441,acum:131408},{yr:2033,ing:63723,op:34188,hip:23393,flujo:6142,acum:137550},{yr:2034,ing:64360,op:36410,hip:23238,flujo:4712,acum:142262},{yr:2035,ing:65004,op:38777,hip:23084,flujo:3143,acum:145405},{yr:2036,ing:65654,op:41297,hip:22930,flujo:1427,acum:146832},{yr:2037,ing:66310,op:43981,hip:22778,flujo:-449,acum:146383},{yr:2038,ing:66974,op:46840,hip:22627,flujo:-2493,acum:143890},{yr:2039,ing:67643,op:49885,hip:22476,flujo:-4718,acum:139172},{yr:2040,ing:68320,op:53127,hip:22327,flujo:-7134,acum:132038},{yr:2041,ing:69003,op:56581,hip:22179,flujo:-9757,acum:122281},{yr:2042,ing:69693,op:60258,hip:22032,flujo:-12597,acum:109684},{yr:2043,ing:70390,op:64175,hip:0,flujo:6215,acum:115899},{yr:2044,ing:71094,op:68346,hip:0,flujo:2748,acum:118647},{yr:2045,ing:71805,op:72789,hip:0,flujo:-984,acum:117663},{yr:2046,ing:72523,op:77520,hip:0,flujo:-4997,acum:112666}]
 };
-var BE={base:2032,optim:2030,cons:null};
 var LABELS2046=PROJ.base.map(function(d){ return String(d.yr); });
-var CASH_OUT=245519;
+var CASH_OUT=245453;
+// La cuota de hipoteca (columna hip) se recalcula con la mecánica Caixa para cada escenario.
+// Ingresos (ing) y gastos operativos (op) se mantienen tal cual. Escenarios de CM (Suposición):
+// optimista = CM −25% sobre la media real reciente; pesimista = +50%. Plazo fijo: última cuota jul-2043.
+var CM_ESC={base:CM_MES,optim:CM_MES*0.75,cons:CM_MES*1.5};
+// Flujo neto acumulado REAL (Excel, mismo criterio que el KPI de flujo acumulado):
+// ingresos − hipoteca (juros+amortización+seguro+tasas) − gastos operativos, por año. Antes eran
+// cifras fijas de una versión anterior (28.599 / 62.687 / 77.717 y 71.284 como arranque).
+var _g=window._gastosPorAño||{}, _ac=0, FLUJO_REAL={};
+Object.keys(_g).map(Number).sort().forEach(function(y){ var d=_g[y]; _ac+=(d.ing-d.gastoOp-d.hip); FLUJO_REAL[y]=_ac; });
+var FLUJO_HOY=_ac; // acumulado hasta la última fila con ingresos del Excel
+var ACUM0=FLUJO_HOY; // el modelo parte de lo real y proyecta desde 2027
+var BE={base:null,optim:null,cons:null};
+['base','optim','cons'].forEach(function(sc){
+  var py=proyectarHipoteca(CM_ESC[sc]), ac=ACUM0;
+  PROJ[sc].forEach(function(r){
+    var p=py[r.yr]; r.hip=p?Math.round(p.cuota):0;
+    r.flujo=r.ing-r.op-r.hip; ac+=r.flujo; r.acum=ac;
+    if(BE[sc]===null&&ac>=CASH_OUT)BE[sc]=r.yr;
+  });
+});
 var projStackedChart=null, projCumChart=null;
 
 function renderProjection(sc){
@@ -2057,7 +2132,7 @@ function renderProjection(sc){
     options:{
       responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false}, tooltip: makeTT(
-        function(ctx){ return ctx.dataset.label==='Cash out'?' Inversion inicial: R$245.519':' '+ctx.dataset.label+': R$'+Math.round(ctx.parsed.y).toLocaleString('pt-BR'); },
+        function(ctx){ return ctx.dataset.label==='Cash out'?' Inversion inicial: R$245.453':' '+ctx.dataset.label+': R$'+Math.round(ctx.parsed.y).toLocaleString('pt-BR'); },
         function(items){ var yr=parseInt(LABELS2046[items[0]?items[0].dataIndex:0]); var lines=[]; if(yr===BE.base) lines.push('Break-even escenario realista'); if(yr===BE.optim) lines.push('Break-even escenario optimista'); return lines.length>0?[''].concat(lines):[]; }
       )},
       scales:{
@@ -2067,16 +2142,16 @@ function renderProjection(sc){
     }
   });
 
-  var r2030=d.find(function(r){return r.yr===2030;}), r2040=d.find(function(r){return r.yr===2040;}), rLast=d[d.length-1];
+  var r2030=d.find(function(r){return r.yr===2030;}), r2040=d.find(function(r){return r.yr===2044;}), rLast=d[d.length-1];
   document.getElementById('pkBE').textContent=BE[sc]?String(BE[sc]):'No alcanzado';
   document.getElementById('pkBE').className='kpi-val '+(BE[sc]?'g':'d');
-  document.getElementById('pkBESub').textContent=BE[sc]?'Cuando el flujo acum. supera R$245.519':'Los flujos solos no cubren la inversion';
+  document.getElementById('pkBESub').textContent=BE[sc]?'Cuando el flujo acum. supera R$245.453':'Los flujos solos no cubren la inversion';
   document.getElementById('pk2030').textContent=r2030?'R$'+(r2030.flujo/1000).toFixed(0)+'k':'--';
   document.getElementById('pk2040').textContent=r2040?'R$'+(r2040.flujo/1000).toFixed(0)+'k':'--';
   document.getElementById('pk2046').textContent='R$'+(rLast.acum/1000).toFixed(0)+'k';
 }
 
-var SCENARIO_LABELS={base:'Escenario Realista: +4%/ano precio · 72% ocupacion · IPCA 4.5%',optim:'Escenario Optimista: +7%/ano precio · 80% ocupacion · IPCA 3.5%',cons:'Escenario Pesimista: +1%/ano precio · 60% ocupacion · IPCA 6.5%'};
+var SCENARIO_LABELS={base:'Escenario Realista: +4%/ano precio · 72% ocupacion · CM = media real reciente',optim:'Escenario Optimista: +7%/ano precio · 80% ocupacion · CM −25%',cons:'Escenario Pesimista: +1%/ano precio · 60% ocupacion · CM +50%'};
 var SCENARIO_CSS={base:'sb-base',optim:'sb-optim',cons:'sb-cons'};
 function setScenario(sc,btn){
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
@@ -2086,6 +2161,26 @@ function setScenario(sc,btn){
   renderProjection(sc);
 }
 renderProjection('base');
+(function(){
+  function set(id,h){ var e=document.getElementById(id); if(e)e.innerHTML=h; }
+  ['optim','base','cons'].forEach(function(sc){
+    var d=PROJ[sc], last=d[d.length-1], neg=null;
+    d.forEach(function(r){ if(neg===null&&r.flujo<0)neg=r.yr; });
+    var roi=Math.round((last.acum-CASH_OUT)/CASH_OUT*100);
+    var be=BE[sc]?'<strong>'+BE[sc]+'</strong>':'<strong>No alcanzado</strong> con solo flujos';
+    set('sc_'+sc, 'Break-even: '+be+'. Flujo acum. 2046: <strong>'+(last.acum<0?'-':'+')+'R$'+Math.round(Math.abs(last.acum)/1000).toLocaleString('pt-BR')+'k</strong>.'+(BE[sc]?' ROI total sobre cash out: <strong>'+(roi>=0?'+':'')+roi+'%</strong>':'')+(neg?' Flujo anual negativo desde <strong>'+neg+'</strong>.':''));
+  });
+  var e=document.getElementById('beTxt'); if(e)e.textContent=BE.base?String(BE.base):'no alcanzado';
+  var rp=(FLUJO_HOY/CASH_OUT*100).toFixed(1).replace('.',',')+'%';
+  set('roiAcumVal',rp); set('roiAcumPct',rp); set('roiAcumFlujo',Math.round(FLUJO_HOY).toLocaleString('pt-BR'));
+  // Tarjetas de escenarios de CM (hipoteca)
+  ['optim','base','cons'].forEach(function(sc){
+    var py=proyectarHipoteca(CM_ESC[sc]), it=0; Object.keys(py).forEach(function(y){it+=py[y].int;});
+    var m2030=py[2030]?py[2030].cuota/12:0, m2040=py[2040]?py[2040].cuota/12:0;
+    var id={optim:'cmEscOptim',base:'cmEscBase',cons:'cmEscCons'}[sc];
+    set(id,'CM '+(CM_ESC[sc]*100).toFixed(2).replace('.',',')+'%/mes · cuota ~R$'+Math.round(m2030).toLocaleString('pt-BR')+' (2030) · ~R$'+Math.round(m2040).toLocaleString('pt-BR')+' (2040) · intereses futuros ~R$'+Math.round(it/1000)+'k');
+  });
+})();
 
 // ── REVALORIZACIÓN ──
 var AÑOS_REVAL=[]; for(var y=2026;y<=2046;y++) AÑOS_REVAL.push(String(y));
@@ -2117,10 +2212,18 @@ new Chart(document.getElementById('revalChart'),{
   }
 });
 
-var flujosAcum={2024:28599,2025:62687,2026:77717,2027:99547,2028:130209,2029:163326,2030:198956,2031:237157,2032:277991,2033:321526,2034:367830,2035:416977,2036:469043,2037:524106,2038:582250,2039:643563,2040:722765,2041:804932,2042:890173,2043:978601,2044:1070333,2045:1165492,2046:1264203};
-var retorno_flujos=AÑOS_REVAL.map(function(y){return flujosAcum[parseInt(y)]||77717;});
+var flujosAcum={2024:FLUJO_REAL[2024]||0,2025:FLUJO_REAL[2025]||0,2026:FLUJO_REAL[2026]||FLUJO_HOY};
+PROJ.base.forEach(function(r){ flujosAcum[r.yr]=r.acum; });
+var retorno_flujos=AÑOS_REVAL.map(function(y){return flujosAcum[parseInt(y)]||FLUJO_HOY;});
 var retorno_plusvalia=reval_base.map(function(v,i){return Math.max(0,v-(saldo_proj[i]||0)-240000);});
 var retorno_total=retorno_flujos.map(function(f,i){return f+retorno_plusvalia[i];});
+(function(){
+  var i43=AÑOS_REVAL.indexOf('2043'), ac=flujosAcum[2043]||0;
+  document.querySelectorAll('.rvA').forEach(function(e){ e.textContent=Math.round(ac/1000).toLocaleString('pt-BR'); });
+  var f=function(v){ return (v/1000000).toFixed(2).replace('.',',')+'M'; };
+  var t={rvTotO:reval_optim[i43],rvTotB:reval_base[i43],rvTotC:reval_cons[i43]};
+  Object.keys(t).forEach(function(id){ var e=document.getElementById(id); if(e)e.textContent=f(t[id]+ac); });
+})();
 
 new Chart(document.getElementById('retornoTotalChart'),{
   type:'bar',
@@ -2132,7 +2235,7 @@ new Chart(document.getElementById('retornoTotalChart'),{
   options:{
     responsive:true, maintainAspectRatio:false,
     plugins:{ legend:{display:false}, tooltip: makeTT(
-      function(ctx){ if(ctx.dataset.label==='Cash out') return ' Cash out inicial: R$245.519'; return ' '+ctx.dataset.label+': R$'+Math.round(ctx.parsed.y).toLocaleString('pt-BR'); },
+      function(ctx){ if(ctx.dataset.label==='Cash out') return ' Cash out inicial: R$245.453'; return ' '+ctx.dataset.label+': R$'+Math.round(ctx.parsed.y).toLocaleString('pt-BR'); },
       function(items){ var i=items[0]?items[0].dataIndex:0; var total=retorno_total[i]; var roi=((total/CASH_OUT)*100).toFixed(0); return['','Retorno total: R$'+Math.round(total).toLocaleString('pt-BR'),'ROI total: +'+roi+'% sobre cash out']; }
     )},
     scales:{
@@ -2220,7 +2323,10 @@ var gcData = [
   {ano:2042,valor:754212,com:45253,cart:11313,ganho:339036,fr2:0.700,trib:237170,irpf:35576,neto:662070,hip:21137,patr:640933},
   {ano:2043,valor:776838,com:46610,cart:11653,ganho:359966,fr2:0.690,trib:248258,irpf:37239,neto:681336,hip:0,patr:681336}
 ];
-var CASH_OUT_TOTAL = 245519;
+var CASH_OUT_TOTAL = 245453;
+// Hipoteca pendiente y patrimonio neto: saldo de fin de año de la tabla de amortización
+// (real + proyección Caixa); antes eran cifras fijas de una proyección antigua.
+gcData.forEach(function(d){ var sd=saldoByYear[d.ano]; d.hip=(sd===undefined||d.ano>=2043)?0:sd; d.patr=d.neto-d.hip; });
 
 var gcBody = document.getElementById('ganhoTableBody');
 if (gcBody) {

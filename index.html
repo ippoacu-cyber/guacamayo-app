@@ -257,6 +257,26 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
 .fut-noches{font-size:12px;color:var(--t1);font-weight:600}
 .fut-ing{font-family:var(--mono);font-size:11px;color:var(--up);flex-shrink:0}
 .fut-empty{padding:20px 14px;text-align:center;color:var(--t3);font-size:11px}
+.prx{background:var(--l1);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:8px;overflow:hidden}
+.prx-top{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+.prx-name{font-size:13px;font-weight:700;color:var(--t1);letter-spacing:.02em}
+.prx-sub{font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:2px}
+.prx-tot{margin-left:auto;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--up);text-align:right;flex-shrink:0}
+.prx-chev{font-size:15px;color:var(--t3);transition:transform .25s;line-height:1;flex-shrink:0}
+.prx.open .prx-chev{transform:rotate(180deg);color:var(--ac)}
+.prx-body{max-height:0;overflow:hidden;transition:max-height .32s ease}
+.prx.open .prx-body{max-height:2400px}
+.prx-g{padding:10px 14px;border-top:1px solid var(--bd);display:flex;gap:10px;align-items:flex-start}
+.prx-g-main{flex:1;min-width:0}
+.prx-g-name{font-size:12px;font-weight:600;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prx-g-meta{font-family:var(--mono);font-size:10px;color:var(--t3);margin-top:3px;line-height:1.5}
+.prx-g-val{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--up);text-align:right;flex-shrink:0}
+.prx-g-pay{font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:3px;text-align:right}
+.prx-tag{display:inline-block;font-size:8px;font-family:var(--mono);letter-spacing:.05em;padding:1px 6px;border-radius:8px;margin-left:6px;vertical-align:middle;border:1px solid var(--bd)}
+.prx-tag.now{color:var(--up);border-color:var(--up)}
+.prx-tag.done{color:var(--t3)}
+.prx-tag.nxt{color:var(--ac);border-color:var(--ac)}
+.prx-empty{padding:12px 14px;border-top:1px solid var(--bd);font-size:11px;color:var(--t3)}
 
 /* ── COSTES vs INGRESOS ── */
 .cost-summary{display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid var(--bd)}
@@ -509,6 +529,11 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
         <button class="nr-btn nr-btn-alt" onclick="gmOpen()">+ Gastos del mes</button>
       </div>
 
+      <!-- Huéspedes del mes actual y los dos siguientes (desplegables) -->
+      <div class="sh"><span>HUÉSPEDES · PRÓXIMOS 3 MESES</span><div class="sh-line"></div><span class="sh-help-btn" onclick="togHelp(this)">?</span></div>
+      <div class="sh-help"><div class="sh-help-inner">Reservas agrupadas por el mes de <strong>llegada</strong> (check-in) del huésped: el mes en curso y los dos siguientes. Toca un mes para ver cada huésped con sus fechas, noches, lo que recibirás tú (neto de comisión Airbnb) y la fecha en que Airbnb te lo paga. Una estancia que empezó el mes anterior y sigue en casa aparece en el mes actual con la etiqueta «desde mes anterior».</div></div>
+      <div id="prxList"></div>
+
       <!-- Comparativa mes actual vs años anteriores -->
       <div class="sh"><span>MES ACTUAL vs AÑOS ANTERIORES</span><div class="sh-line"></div><span class="sh-help-btn" onclick="togHelp(this)">?</span></div>
       <div class="sh-help"><div class="sh-help-inner">Compara el mismo mes calendario (por ejemplo, todos los agostos) a lo largo de los años en que ha operado el Airbnb. Te permite ver si un mes va mejor o peor que en años anteriores — la fila resaltada en lima es el año en curso.</div></div>
@@ -575,8 +600,8 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
           <div class="xc-body"><div class="xc-txt"><div class="xc-ttl">¿Qué significa?</div>El piso vale hoy ~R$470.000 (fuente: Loft, QuintoAndar). Lo compraste por R$240.000. La diferencia — <strong>R$230.000</strong> — es una ganancia latente: es tuya, pero solo la cobras si vendes.</div></div>
         </div>
         <div class="xc" onclick="tog(this)">
-          <div class="xc-top"><div class="xc-left"><div class="xc-lbl">Break-even</div><div class="xc-val wa">2032</div><div class="xc-sub">Solo flujos Airbnb</div></div><span class="xc-chev">⌄</span></div>
-          <div class="xc-body"><div class="xc-txt"><div class="xc-ttl">¿Qué significa?</div>El año en que habrás recuperado todo el dinero que pusiste de tu bolsillo (R$245.519) únicamente con el flujo de caja del Airbnb. Si sumas la revalorización del piso, ya has recuperado más de lo invertido hoy.</div></div>
+          <div class="xc-top"><div class="xc-left"><div class="xc-lbl">Break-even</div><div class="xc-val wa" id="beXcVal">2032</div><div class="xc-sub">Solo flujos Airbnb</div></div><span class="xc-chev">⌄</span></div>
+          <div class="xc-body"><div class="xc-txt"><div class="xc-ttl">¿Qué significa?</div>El año en que habrás recuperado todo el dinero que pusiste de tu bolsillo (R$245.453) únicamente con el flujo de caja del Airbnb. Si sumas la revalorización del piso, ya has recuperado más de lo invertido hoy.</div></div>
         </div>
       </div>
 
@@ -643,19 +668,19 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
         <div class="xhbar" onclick="tog(this)">
           <div class="xhbar-head"><div class="hbar-lbl">Yield bruto / coste total</div><div style="display:flex;align-items:center"><div class="hbar-val ac">17.0%</div><span class="xhbar-chev">⌄</span></div></div>
           <div class="xhbar-track"><div class="xhbar-fill" style="width:48%;background:var(--ac)"></div></div>
-          <div class="xhbar-sub">R$73.185 / R$431.535 (cash out + hipoteca)</div>
-          <div class="xhbar-body"><div class="xhbar-txt">Lo mismo pero usando <strong>todo lo que costó el piso</strong>: escritura + reforma + impuestos + gestora + hipoteca (R$431.535 total). Es más honesto porque incluye lo que pagaste para ponerlo en marcha.</div></div>
+          <div class="xhbar-sub">R$73.185 / R$431.519 (cash out + hipoteca)</div>
+          <div class="xhbar-body"><div class="xhbar-txt">Lo mismo pero usando <strong>todo lo que costó el piso</strong>: escritura + reforma + impuestos + gestora + hipoteca (R$431.519 total). Es más honesto porque incluye lo que pagaste para ponerlo en marcha.</div></div>
         </div>
         <div class="xhbar" onclick="tog(this)">
           <div class="xhbar-head"><div class="hbar-lbl">Cap Rate / coste total</div><div style="display:flex;align-items:center"><div class="hbar-val ac">12.6%</div><span class="xhbar-chev">⌄</span></div></div>
           <div class="xhbar-track"><div class="xhbar-fill" style="width:36%;background:var(--ac)"></div></div>
-          <div class="xhbar-sub">NOI R$54.249 / inversión total R$431.535</div>
+          <div class="xhbar-sub">NOI R$54.249 / inversión total R$431.519</div>
           <div class="xhbar-body"><div class="xhbar-txt">El <strong>Cap Rate</strong> es el indicador estándar del sector profesional: ingresos menos gastos operativos (sin hipoteca) dividido entre el coste total. Los fondos inmobiliarios consideran un 8-10% excelente. Tu 12.6% casi dobla ese umbral.</div></div>
         </div>
         <div class="xhbar" onclick="tog(this)">
           <div class="xhbar-head"><div class="hbar-lbl">Cash-on-Cash Return</div><div style="display:flex;align-items:center"><div class="hbar-val ac">13.9%</div><span class="xhbar-chev">⌄</span></div></div>
           <div class="xhbar-track"><div class="xhbar-fill" style="width:40%;background:var(--ac)"></div></div>
-          <div class="xhbar-sub">Flujo neto / capital propio R$245.519</div>
+          <div class="xhbar-sub">Flujo neto / capital propio R$245.453</div>
           <div class="xhbar-body"><div class="xhbar-txt">Mide cuánto rinde <strong>el dinero que pusiste de tu bolsillo</strong>. Un 13.9% anual supera la SELIC (12%) — tu dinero rinde más que la alternativa más segura del mercado brasileño.</div></div>
         </div>
         <div class="xhbar" onclick="tog(this)">
@@ -681,15 +706,19 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
             <span style="color:var(--t3)" id="hipSaldo">R$177.171 pendiente</span>
           </div>
           <div class="hip-bar"><div class="hip-fill" id="hipFill" style="width:4.8%"></div></div>
-          <div class="hip-labels"><span>ago-2023</span><span>ago-2043</span></div>
+          <div class="hip-labels"><span>ago-2023</span><span>jul-2043</span></div>
         </div>
         <div class="xr" onclick="tog(this)">
           <div class="xr-top"><div class="xr-l">TIN / TAE</div><div style="display:flex;align-items:center"><span class="xr-r">7.16% / 7.40%</span><span class="xr-chev">⌄</span></div></div>
-          <div class="xr-body"><div class="xr-txt">El <strong>TIN</strong> (7.16%) es la tasa de interés nominal (Juros) que cobra el banco. El <strong>TAE</strong> (7.40%) es más alto porque incluye el efecto de la <strong>Corrección Monetaria</strong> (indexación por IPCA/cambio de divisa): cada cuota se compone de Intereses + Amortización, y la Corrección Monetaria reduce la parte que realmente amortiza capital — por eso el coste efectivo total (TAE) supera al interés nominal (TIN).</div></div>
+          <div class="xr-body"><div class="xr-txt">Son los valores de tu <strong>contrato con la Caixa</strong>. El <strong>TIN</strong> (7.16%) es el tipo de interés nominal anual (Juros). El <strong>TAE</strong> (7.40%) es ese mismo tipo expresado como tasa efectiva anual (capitalizando los intereses cada mes): por eso es algo mayor. <strong>No incluye la Corrección Monetaria</strong>, que la Caixa aplica aparte sobre el saldo de la deuda (mira la fila siguiente). Referencia de mercado: la Caixa anuncia financiación habitual desde ~11,19% anual + TR; tu 7,16% es de una línea con FGTS y es bastante más barata.</div></div>
+        </div>
+        <div class="xr" onclick="tog(this)">
+          <div class="xr-top"><div class="xr-l">TAE real con Corrección Monetaria <span style="font-size:10px;color:var(--t3)">· informativo</span></div><div style="display:flex;align-items:center"><span class="xr-r" id="hipTaeReal">—</span><span class="xr-chev">⌄</span></div></div>
+          <div class="xr-body"><div class="xr-txt" id="hipTaeRealTxt">Calculando con los últimos meses del Excel…</div></div>
         </div>
         <div class="xr" onclick="tog(this)">
           <div class="xr-top"><div class="xr-l">Cuota mensual</div><div style="display:flex;align-items:center"><span class="xr-r" id="hipCuota">~R$1.556</span><span class="xr-chev">⌄</span></div></div>
-          <div class="xr-body"><div class="xr-txt">Lo que pagas cada mes al banco: intereses, amortización de capital, seguro de vida, tasas y Corrección Monetaria (IPCA). En años de alta inflación la cuota puede subir ligeramente.</div></div>
+          <div class="xr-body"><div class="xr-txt">Lo que pagas cada mes al banco: intereses + amortización de capital + seguro + tasas. La <strong>Corrección Monetaria no va dentro de la cuota</strong>: la Caixa la suma al saldo de la deuda cada mes. La cuota no es fija: se recalcula cada mes sobre el saldo ya actualizado y sube unos R$2-3 al mes. En el Excel la columna "Hipoteca/Amortizacion" es el valor total devido (puede incluir mora de pagos con retraso).</div></div>
         </div>
         <div class="xr" onclick="tog(this)">
           <div class="xr-top"><div class="xr-l">LTV actual</div><div style="display:flex;align-items:center"><span class="xr-r up" id="hipLtv">37.8%</span><span class="xr-chev">⌄</span></div></div>
@@ -701,7 +730,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
         </div>
         <div class="xr hl" onclick="tog(this)">
           <div class="xr-top"><div class="xr-l">Fin hipoteca</div><div style="display:flex;align-items:center"><span class="xr-r ac">Agosto 2043</span><span class="xr-chev">⌄</span></div></div>
-          <div class="xr-body"><div class="xr-txt">En agosto de 2043 pagas la última cuota y el piso es <strong>100% tuyo</strong>. Según el escenario realista (+3%/año), valdrá ~R$777.000. A partir de ahí, cada mes de Airbnb es beneficio puro sin destinar nada al banco.</div></div>
+          <div class="xr-body"><div class="xr-txt">En julio de 2043 pagas la última cuota y el piso es <strong>100% tuyo</strong>. Según el escenario realista (+3%/año), valdrá ~R$777.000. A partir de ahí, cada mes de Airbnb es beneficio puro sin destinar nada al banco.</div></div>
         </div>
       </div>
 
@@ -709,24 +738,24 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
       <div class="sh-help"><div class="sh-help-inner">Muestra de qué está compuesto el valor total de tu inversión: qué parte es deuda pendiente (lo que aún debes al banco) y qué parte es patrimonio real tuyo (lo que ya es tuyo del piso). Cuanta menos deuda y más patrimonio propio, menos riesgo financiero tienes.</div></div>
       <div class="card">
         <div class="xr" onclick="tog(this)">
-          <div class="xr-top"><div class="xr-l">Cash out neto (capital propio)</div><div style="display:flex;align-items:center"><span class="xr-r wa">R$245.519</span><span class="xr-chev">⌄</span></div></div>
+          <div class="xr-top"><div class="xr-l">Cash out neto (capital propio)</div><div style="display:flex;align-items:center"><span class="xr-r wa">R$245.453</span><span class="xr-chev">⌄</span></div></div>
           <div class="xr-body"><div class="xr-txt">Todo el dinero que salió <strong>de tu bolsillo</strong>: entrada, reforma (R$125k), impuestos, gestora, asesoría, escritura. La base sobre la que se calcula el Cash-on-Cash Return.</div></div>
         </div>
         <div class="xr" onclick="tog(this)">
-          <div class="xr-top"><div class="xr-l">Hipoteca Caixa</div><div style="display:flex;align-items:center"><span class="xr-r ac">R$186.016</span><span class="xr-chev">⌄</span></div></div>
-          <div class="xr-body"><div class="xr-txt">Capital que financió el banco. Junto con lo que pusiste tú (R$245k), suma el <strong>coste total real: R$431.535</strong>. El apalancamiento del banco es lo que hace tan alto el Cash-on-Cash.</div></div>
+          <div class="xr-top"><div class="xr-l">Hipoteca Caixa</div><div style="display:flex;align-items:center"><span class="xr-r ac">R$186.066</span><span class="xr-chev">⌄</span></div></div>
+          <div class="xr-body"><div class="xr-txt">Capital que financió el banco. Junto con lo que pusiste tú (R$245k), suma el <strong>coste total real: R$431.519</strong>. El apalancamiento del banco es lo que hace tan alto el Cash-on-Cash.</div></div>
         </div>
         <div class="xr" onclick="tog(this)">
-          <div class="xr-top"><div class="xr-l">Coste total real</div><div style="display:flex;align-items:center"><span class="xr-r">R$431.535</span><span class="xr-chev">⌄</span></div></div>
-          <div class="xr-body"><div class="xr-txt">Suma de todo lo que costó poner el piso en marcha y operativo: tu dinero (R$245.519) más el dinero del banco (R$186.016). El denominador para calcular el Cap Rate y el Yield real.</div></div>
+          <div class="xr-top"><div class="xr-l">Coste total real</div><div style="display:flex;align-items:center"><span class="xr-r">R$431.519</span><span class="xr-chev">⌄</span></div></div>
+          <div class="xr-body"><div class="xr-txt">Suma de todo lo que costó poner el piso en marcha y operativo: tu dinero (R$245.453) más el dinero del banco (R$186.066). El denominador para calcular el Cap Rate y el Yield real.</div></div>
         </div>
         <div class="xr" onclick="tog(this)">
           <div class="xr-top"><div class="xr-l">Flujo neto acumulado</div><div style="display:flex;align-items:center"><span class="xr-r up" id="capFluj">R$43.9k</span><span class="xr-chev">⌄</span></div></div>
           <div class="xr-body"><div class="xr-txt">El dinero que ha pasado por tu cuenta como beneficio neto del Airbnb. Representa el <strong>17.9% del capital propio</strong> ya recuperado en efectivo desde el inicio de operaciones.</div></div>
         </div>
         <div class="xr hl" onclick="tog(this)">
-          <div class="xr-top"><div class="xr-l">Break-even</div><div style="display:flex;align-items:center"><span class="xr-r wa">2032</span><span class="xr-chev">⌄</span></div></div>
-          <div class="xr-body"><div class="xr-txt">El año en que el flujo acumulado igualará el total que pusiste de tu bolsillo (R$245.519). A partir de ese momento, cada euro del Airbnb es <strong>ganancia pura</strong> sobre el capital invertido.</div></div>
+          <div class="xr-top"><div class="xr-l">Break-even</div><div style="display:flex;align-items:center"><span class="xr-r wa" id="beXrVal">2032</span><span class="xr-chev">⌄</span></div></div>
+          <div class="xr-body"><div class="xr-txt">El año en que el flujo acumulado igualará el total que pusiste de tu bolsillo (R$245.453). A partir de ese momento, cada euro del Airbnb es <strong>ganancia pura</strong> sobre el capital invertido.</div></div>
         </div>
       </div>
 
@@ -786,7 +815,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
       </div>
 
       <div class="sh"><span>SIMULACIÓN 2021-2043: SELIC VS AIRBNB</span><div class="sh-line"></div><span class="sh-help-btn" onclick="togHelp(this)">?</span></div>
-      <div class="sh-help"><div class="sh-help-inner">Proyección a <strong>22 años, desde marzo de 2021 hasta agosto de 2043</strong> (fecha de compra hasta el fin de la hipoteca Caixa), con 3 escenarios para cada activo. <strong>Selic</strong>: histórico real (Banco Central) hasta agosto 2026, luego 3 trayectorias calibradas con proyecciones de mercado (Boletim Focus) hasta 2031, mantenidas constantes después. <strong>Airbnb</strong>: remuestreo aleatorio de tus meses reales de flujo neto, con una subida de precio del 8% cada 2 años; el escenario optimista/pesimista ajusta ese flujo ±15-25%. No incluye la revalorización del propio inmueble ni el Imposto de Renda sobre la ganancia en renta fija.</div></div>
+      <div class="sh-help"><div class="sh-help-inner">Proyección a <strong>22 años, desde marzo de 2021 hasta julio de 2043</strong> (fecha de compra hasta el fin de la hipoteca Caixa), con 3 escenarios para cada activo. <strong>Selic</strong>: histórico real (Banco Central) hasta agosto 2026, luego 3 trayectorias calibradas con proyecciones de mercado (Boletim Focus) hasta 2031, mantenidas constantes después. <strong>Airbnb</strong>: remuestreo aleatorio de tus meses reales de flujo neto, con una subida de precio del 8% cada 2 años; el escenario optimista/pesimista ajusta ese flujo ±15-25%. No incluye la revalorización del propio inmueble ni el Imposto de Renda sobre la ganancia en renta fija.</div></div>
       <div class="card">
         <div class="be-wrap">
           <div class="be-legend" id="selicLegend"></div>
@@ -825,7 +854,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
         <div class="strip-c"><div class="strip-v ac">R$0</div><div class="strip-l">Deuda</div></div>
         <div class="strip-c"><div class="strip-v up">R$681k</div><div class="strip-l">Neto al vender</div></div>
       </div>
-      <div class="card" style="padding:13px 14px;font-size:11px;color:var(--t2);line-height:1.65">En 2043, con la hipoteca liquidada y una revalorización realista del 3%/año, el piso valdría <strong style="color:var(--t1)">R$777.000</strong>. Sumando los flujos netos del Airbnb acumulados durante 19 años, el retorno total sobre tu inversión inicial de R$245.519 supera el <strong style="color:var(--up)">400%</strong>.</div>
+      <div class="card" style="padding:13px 14px;font-size:11px;color:var(--t2);line-height:1.65">En 2043, con la hipoteca liquidada y una revalorización realista del 3%/año, el piso valdría <strong style="color:var(--t1)">R$777.000</strong>. Sumando los flujos netos del Airbnb acumulados durante 19 años, el retorno total sobre tu inversión inicial de R$245.453 supera el <strong style="color:var(--up)">400%</strong>.</div>
 
       <div class="sh"><span>OCUPACIÓN POR AÑO</span><div class="sh-line"></div><span class="sh-help-btn" onclick="togHelp(this)">?</span></div>
       <div class="sh-help"><div class="sh-help-inner">El porcentaje de noches del año en que el piso estuvo realmente alquilado, sobre el total de noches disponibles. Ejemplo: 75% significa que 3 de cada 4 noches del año tuviste el piso ocupado con huéspedes pagando. Cuanto más alto, mejor aprovechado está el piso.</div></div>
@@ -971,7 +1000,7 @@ var G={
   flujo_acum:52569,ing_acum:172482,tot_noches:672,
   tot_res:128,adr_global:272,saldo_hip:177171,
   occ_2024:68.6,occ_2025:76.2,occ_2026:75.5,
-  costes:{hip:57125,juros:39202,correccion:9048,seguro:1301,tasas:900,condo:26536,luz:4091,net:2160,limp:7791,manto:1723,wise:995},
+  costes:{hip:52663,juros:35832,amort:14634,correccion:7337,seguro:1206,tasas:825,condo:24799,luz:4124,net:1980,limp:17341,manto:1623,wise:731},
   resumen:{totAnfitrion:182979,sumLimp:23962,sumComHues:28545,sumImpuestos:1183,sumTotHues:221567,sumDescuento:18450,sumComAnf:7386,
            porAño:{"2024":{ing:57339,noches:217,res:40},"2025":{ing:74280,noches:263,res:54},"2026":{ing:51361,noches:192,res:34}}},
   futuras:[],
@@ -987,7 +1016,7 @@ var G={
     entradaFinanciada:23000, escritura:10800, devolucionEscritura:800,
     interesesConstructora:2529.83,
     evolucionObra:18385, reformaApartamento:125620,
-    financiamentoCaixa:186016
+    financiamentoCaixa:186065.54
   }
 };
 
@@ -1255,12 +1284,15 @@ function processExcel(values){
   if(cFecha<0||cHip<0){console.warn('Inmobiliario: columnas clave no encontradas');return;}
 
   var updated=0;
-  var costes={hip:0,juros:0,correccion:0,seguro:0,tasas:0,condo:0,luz:0,net:0,limp:0,manto:0,wise:0};
+  var serieCM=[]; // meses ya transcurridos con saldo: base del "TAE real con CM"
+  var costes={hip:0,juros:0,amort:0,correccion:0,seguro:0,tasas:0,condo:0,luz:0,net:0,limp:0,manto:0,wise:0};
   values.slice(headerRowIdx+1).forEach(function(row){
     if(!row||row[cFecha]==null)return;
     var d=parseDate(row[cFecha]);
     if(!d)return;
     var yr=d.getFullYear();
+    var _sal=cSaldo>=0?(parseFloat(row[cSaldo])||0):0;
+    if(_sal>0&&d.getTime()<=Date.now())serieCM.push({t:d.getTime(),saldo:_sal,cm:cCM>=0?(parseFloat(row[cCM])||0):0});
     if(yr<2024||yr>2030)return;
     var ms=d.getMonth();
     var k=String(yr);
@@ -1291,9 +1323,18 @@ function processExcel(values){
       H2[k].ing[ms]=Math.round(ing);H2[k].neto[ms]=Math.round(neto);
       updated++;
     }
-    // Desglose de gastos operativos recurrentes — solo periodo Airbnb (ing>0 o hip>0, es decir, desde que opera)
-    if(ing>0||hip>0){
+    // Desglose de gastos acumulados — SOLO meses con ingresos reales (ing>0).
+    // Antes el criterio era ing>0||hip>0, que metía ene-2024 (antes de abrir) y los
+    // meses futuros con cuota proyectada (nov/dic-2026), inflando el acumulado.
+    // Hipoteca: el gasto es Juros + Ev.Obra/Amortización + Seguro + Tasas (D+E+F+G),
+    // igual que la fórmula Beneficio del Excel. La columna C (Hipoteca/Amortizacion)
+    // es la cuota TOTAL ya compuesta por esas cuatro partes, así que NO se suma además
+    // (sumarla junto a juros/seguro/tasas contaba la hipoteca dos veces). C se guarda
+    // solo como referencia (costes.hip). La Corrección Monetaria (H) no es un pago de
+    // la cuota: sube el saldo; por eso NO entra en el gasto (solo en la amortización real).
+    if(ing>0){
       costes.hip+=hip;
+      costes.amort+=cEvObra>=0?(parseFloat(row[cEvObra])||0):0;
       costes.juros+=cJuros>=0?(parseFloat(row[cJuros])||0):0;
       costes.correccion+=cCM>=0?(parseFloat(row[cCM])||0):0;
       costes.seguro+=cSeguro>=0?(parseFloat(row[cSeguro])||0):0;
@@ -1307,12 +1348,24 @@ function processExcel(values){
     }
   });
   G.costes=costes;
+  // TAE real con Corrección Monetaria (solo informativo; el TIN/TAE del contrato no cambia).
+  // CM mensual = CM_t / saldo_{t-1}, media de los últimos 3 meses reales. La CM es variable.
+  serieCM.sort(function(a,b){return a.t-b.t;});
+  var _cs=[],_n=serieCM.length;
+  for(var _k=Math.max(1,_n-3);_k<_n;_k++){if(serieCM[_k-1].saldo>0&&serieCM[_k].cm>0)_cs.push(serieCM[_k].cm/serieCM[_k-1].saldo);}
+  if(_cs.length){
+    var _c=_cs.reduce(function(a,b){return a+b;},0)/_cs.length;
+    G.cmMes=_c; G.cmMeses=_cs.length;
+    G.taeReal=(Math.pow((1+0.0716/12)*(1+_c),12)-1)*100;
+    G.cmUlt=serieCM[_n-1].cm; G.cmUltFecha=serieCM[_n-1].t;
+  }
   // Recalcular GLOBALS
   var fl=0,ing=0,sl=0;
   ['2024','2025','2026'].forEach(function(y){
     for(var m=0;m<12;m++){
       if(H2[y]&&H2[y].ing[m]>0){fl+=H2[y].neto[m];ing+=H2[y].ing[m];}
-      if(H2[y]&&H2[y].saldo[m]>0)sl=H2[y].saldo[m];
+      // solo meses ya transcurridos: los meses futuros del Excel son marcadores de posición
+      if(H2[y]&&H2[y].saldo[m]>0&&new Date(parseInt(y,10),m,1).getTime()<=Date.now())sl=H2[y].saldo[m];
     }
   });
   // Nota: H2[y].neto[m] ya se calculó arriba como ingresos - gasto operativo
@@ -1620,6 +1673,17 @@ function gmBack(){
   gmRenderStep();
 }
 
+// Aviso de cuadre: la cuota total (C) debería ser Juros+Ev.Obra/Amort.+Seguro+Tasas (D+E+F+G).
+// La corrección monetaria NO forma parte de la cuota. Es solo un aviso, no bloquea el guardado.
+function gmCuadreRow(d){
+  var c=parseFloat(d.hipoteca)||0;
+  var sum=(parseFloat(d.juros)||0)+(parseFloat(d.evObra)||0)+(parseFloat(d.seguro)||0)+(parseFloat(d.tasas)||0);
+  var dif=Math.round((c-sum)*100)/100;
+  if(c===0&&sum>0)return nrRow('Cuadre cuota','C=0 (fase de obra): se usa D+E+F+G');
+  if(Math.abs(dif)<=5)return nrRow('Cuadre cuota','✓ C = D+E+F+G (dif. R$'+dif+')');
+  return nrRow('⚠ Cuadre cuota','C − (D+E+F+G) = R$'+dif+' — revisa los importes');
+}
+
 function gmRenderStep(){
   var b=document.getElementById('gmBody');
   var d=gmState.data;
@@ -1669,8 +1733,9 @@ function gmRenderStep(){
       '<div class="nr-summary-section">'+MESES_GM[d.mes]+' '+d.año+'</div>'+
       '<div class="nr-summary-row"><span class="k" style="color:var(--ac)">'+accionTxt+'</span></div>'+
       nrRow('Ingresos Airbnb (calculado)','R$'+ingAirbnb)+
-      nrRow('Hipoteca/Amortización','R$'+d.hipoteca)+nrRow('Juros','R$'+d.juros)+nrRow('Ev. Obra/Amortización','R$'+d.evObra)+
-      nrRow('Seguro','R$'+d.seguro)+nrRow('Tasas','R$'+d.tasas)+nrRow('Corrección Monetaria','R$'+d.correccion)+nrRow('Otros','R$'+d.otros)+
+      nrRow('Hipoteca/Amortización (cuota total)','R$'+d.hipoteca)+nrRow('Juros','R$'+d.juros)+nrRow('Ev. Obra/Amortización','R$'+d.evObra)+
+      nrRow('Seguro','R$'+d.seguro)+nrRow('Tasas','R$'+d.tasas)+nrRow('Corrección Monetaria (no va en la cuota)','R$'+d.correccion)+nrRow('Otros','R$'+d.otros)+
+      gmCuadreRow(d)+
       nrRow('Condominio','R$'+d.condominio)+nrRow('Luz','R$'+d.luz)+nrRow('Internet','R$'+d.internet)+
       nrRow('Limpieza','R$'+d.limpieza)+nrRow('Mantenimiento','R$'+d.mantenimiento)+nrRow('Comisiones Wise','R$'+d.wise)+
       '<div id="gmSaveStatus"></div>';
@@ -2007,6 +2072,8 @@ function processAirbnb(values){
   var cDescuento=findCol(headerRow,'Descuento Dado');
   var cComAnf=findCol(headerRow,'Com. Airbnb Anfitrion');
   var cFechaPago=findCol(headerRow,'Fecha Pago');
+  var cHuesped=findCol(headerRow,'Huesped');
+  var cPersonas=findCol(headerRow,'Personas');
   if(cEntrada<0){console.warn('Airbnb: columna Fecha Entrada no encontrada');return;}
 
   var newNTS={"2024":[0,0,0,0,0,0,0,0,0,0,0,0],"2025":[0,0,0,0,0,0,0,0,0,0,0,0],"2026":[0,0,0,0,0,0,0,0,0,0,0,0]};
@@ -2018,6 +2085,8 @@ function processAirbnb(values){
   var porAño={}; // {2024:{ing,noches,res},...}
   var futurasPorMes={}; // {"2026-10":{ing,noches,res},...} agrupado por MES DE PAGO
   var hoy=new Date(); hoy.setHours(0,0,0,0);
+  var proximas=[]; // reservas que tocan el mes actual o los 2 siguientes (para «Huéspedes próximos»)
+  var prxIni=new Date(hoy.getFullYear(),hoy.getMonth(),1), prxFin=new Date(hoy.getFullYear(),hoy.getMonth()+3,1);
 
   values.slice(headerRowIdx+1).forEach(function(row){
     if(!row)return;
@@ -2028,6 +2097,17 @@ function processAirbnb(values){
     var adr=cAdr>=0?(parseFloat(row[cAdr])||0):0; // Promedio Anfitrion/Noche de esa reserva
     var totAnf=cTotAnf>=0?(parseFloat(row[cTotAnf])||0):0; // TOT. Anfitrion de esa reserva
     var noches_res=cNoches>=0?(parseFloat(row[cNoches])||0):0;
+
+    // Huéspedes próximos: check-in dentro de [mes actual, +3 meses) o estancia que viene del mes anterior y sigue en curso
+    if((entrada>=prxIni&&entrada<prxFin)||(entrada<prxIni&&salida&&salida>prxIni)){
+      var nochesP=noches_res||((salida&&salida>entrada)?Math.round((salida-entrada)/86400000):0);
+      proximas.push({
+        nombre:cHuesped>=0?String(row[cHuesped]||'').trim():'',
+        personas:cPersonas>=0?(parseFloat(row[cPersonas])||0):0,
+        entrada:entrada.getTime(), salida:salida?salida.getTime():null,
+        noches:nochesP, ing:totAnf, pago:fechaPago?fechaPago.getTime():null
+      });
+    }
 
     // Reserva cuenta en el mes de check-in
     var kE=String(entrada.getFullYear()), mE=entrada.getMonth();
@@ -2085,6 +2165,8 @@ function processAirbnb(values){
     sumImpuestos:sumImpuestos, sumTotHues:sumTotHues, sumDescuento:sumDescuento,
     sumComAnf:sumComAnf, porAño:porAño
   };
+  proximas.sort(function(a,b){return a.entrada-b.entrada;});
+  G.proximas=proximas;
   G.futuras=Object.values(futurasPorMes).sort(function(a,b){return (a.año*12+a.mes)-(b.año*12+b.mes);});
   console.log('Airbnb OK: '+totRes+' reservas, '+totNoches+' noches, '+Object.keys(futurasPorMes).length+' meses futuros con pagos pendientes');
 }
@@ -2128,10 +2210,17 @@ function renderAll(){
   $('kpiAdrSub').textContent='Huésped paga ~R$'+Math.round(G.adr_global/0.85);
   $('capFluj').textContent='R$'+Math.round(G.flujo_acum/1000*10)/10+'k';
   // Hipoteca
-  var pct=((186016-G.saldo_hip)/186016*100).toFixed(1);
+  var _fc=(G.capitalInicial&&G.capitalInicial.financiamentoCaixa)||186065.54;
+  var pct=((_fc-G.saldo_hip)/_fc*100).toFixed(1);
   $('hipFill').style.width=pct+'%';
   $('hipSaldo').textContent='R$'+fn(G.saldo_hip)+' pendiente';
   $('hipCuota').textContent='~R$'+fn(d.hip);
+  if(G.taeReal){
+    var cmA=(Math.pow(1+G.cmMes,12)-1)*100;
+    var fp=function(v,dd){return v.toFixed(dd).replace('.',',');};
+    $('hipTaeReal').textContent='~'+fp(G.taeReal,1)+'%';
+    $('hipTaeRealTxt').innerHTML='Es el coste anual <strong>real</strong> de tu deuda si sumas la Corrección Monetaria (CM) a los intereses. La Caixa actualiza el saldo cada mes con la CM (indexador tipo TR / Poupança-FGTS, <strong>variable</strong>) y calcula los intereses sobre ese saldo ya actualizado. Con la CM media de los últimos '+G.cmMeses+' meses del Excel ('+fp(G.cmMes*100,2)+'% al mes ≈ '+fp(cmA,2)+'% al año) sale <strong>~'+fp(G.taeReal,2)+'%</strong>, frente al 7,40% del contrato. Fórmula: ((1 + 7,16%/12) × (1 + CM mensual))^12 − 1. <em>Nota informativa:</em> cambia cada mes con la CM; el TIN/TAE contractual no se toca. Referencia: la Caixa anuncia financiación desde ~11,19% anual + TR (fuente comercial, confirmar con el banco), así que incluso con la CM tu coste real queda por debajo.';
+  }
   var ltv=Math.round(G.saldo_hip/470000*100*10)/10;
   $('hipLtv').textContent=ltv+'%';
   // Strip totales
@@ -2147,6 +2236,7 @@ function renderAll(){
   renderSplitBar();
   renderCmpTable();
   renderFuturas();
+  renderProximas();
   renderCostesVsIngresos();
   renderResumenGeneral();
   renderCapitalDesglose();
@@ -2197,6 +2287,51 @@ function showCmpInfo(y,mesIdx){
   txt+='Precio medio: <strong>'+(adr?'R$'+adr+'/noche':'sin datos')+'</strong><br>';
   txt+='Reservas con check-in este mes: <strong>'+res+'</strong>';
   showInfo(MESES[mesIdx].toUpperCase()+' '+y,txt);
+}
+
+var _prxOpen={}; // estado abierto/cerrado de cada desplegable (sobrevive a re-renders)
+function prxToggle(i){
+  _prxOpen[i]=!_prxOpen[i];
+  var el=document.getElementById('prx'+i);
+  if(el)el.classList.toggle('open',!!_prxOpen[i]);
+}
+function prxEsc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function prxDM(ms){var d=new Date(ms);return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);}
+function renderProximas(){
+  var el=$('prxList');
+  if(!el)return;
+  var prx=G.proximas||[];
+  var hoy=new Date(); hoy.setHours(0,0,0,0);
+  var html='';
+  for(var i=0;i<3;i++){
+    var ini=new Date(hoy.getFullYear(),hoy.getMonth()+i,1), fin=new Date(hoy.getFullYear(),hoy.getMonth()+i+1,1);
+    var lista=prx.filter(function(r){
+      var inMes=r.entrada>=ini.getTime()&&r.entrada<fin.getTime();
+      var viene=i===0&&r.entrada<ini.getTime()&&r.salida&&r.salida>ini.getTime();
+      return inMes||viene;
+    });
+    var tot=0,noches=0;
+    lista.forEach(function(r){tot+=r.ing;noches+=r.noches;});
+    html+='<div class="prx'+(_prxOpen[i]?' open':'')+'" id="prx'+i+'">';
+    html+='<div class="prx-top" onclick="prxToggle('+i+')"><div><div class="prx-name">'+MESES[ini.getMonth()].toUpperCase()+' '+ini.getFullYear()+(i===0?' · EN CURSO':'')+'</div>';
+    html+='<div class="prx-sub">'+(lista.length?lista.length+' reserva'+(lista.length!==1?'s':'')+' · '+noches+' noche'+(noches!==1?'s':''):'Sin reservas')+'</div></div>';
+    html+='<div class="prx-tot">'+(lista.length?'R$'+fn(tot):'—')+'</div><span class="prx-chev">⌄</span></div>';
+    html+='<div class="prx-body">';
+    if(!lista.length)html+='<div class="prx-empty">No hay huéspedes con check-in este mes en el Excel.</div>';
+    lista.forEach(function(r){
+      var tag='';
+      if(r.salida&&r.entrada<=hoy.getTime()&&r.salida>hoy.getTime())tag='<span class="prx-tag now">EN CASA</span>';
+      else if(r.salida&&r.salida<=hoy.getTime())tag='<span class="prx-tag done">FINALIZADA</span>';
+      else if(r.entrada>hoy.getTime())tag='<span class="prx-tag nxt">PRÓXIMA</span>';
+      if(r.entrada<ini.getTime())tag+='<span class="prx-tag">DESDE MES ANTERIOR</span>';
+      var cobrado=r.pago&&r.pago<hoy.getTime();
+      html+='<div class="prx-g"><div class="prx-g-main"><div class="prx-g-name">'+prxEsc(r.nombre||'(sin nombre)')+tag+'</div>';
+      html+='<div class="prx-g-meta">'+prxDM(r.entrada)+' → '+(r.salida?prxDM(r.salida):'?')+' · '+r.noches+' noche'+(r.noches!==1?'s':'')+(r.personas?' · '+r.personas+' pers.':'')+'</div></div>';
+      html+='<div><div class="prx-g-val">R$'+fn(r.ing)+'</div><div class="prx-g-pay">'+(r.pago?(cobrado?'cobrado ':'cobro ')+prxDM(r.pago):'sin fecha de pago')+'</div></div></div>';
+    });
+    html+='</div></div>';
+  }
+  el.innerHTML=html;
 }
 
 function renderFuturas(){
@@ -2310,7 +2445,12 @@ function renderResumenGeneral(){
 }
 
 function renderBreakEvenChart(){
-  var CAPITAL_BOLSILLO=216536; // solo capital directo de bolsillo, sin entrada financiada ni hipoteca Caixa
+  // Capital de bolsillo = cash-out propio completo (239.535,83). Incluye los 23.000 de la entrada que la
+  // constructora financió a corto plazo: Gorka los pagó en cuotas de interés (abr–oct 2021) y los amortizó en
+  // nov–dic 2021, así que salieron de su bolsillo (decisión del 27-oct-2026). Excluye la hipoteca Caixa.
+  var _ci=G.capitalInicial||{};
+  var CAPITAL_BOLSILLO=(_ci.entradaVista||0)+(_ci.entradaFinanciada||0)+(_ci.costeGestora||0)+(_ci.costeInmobiliaria||0)+(_ci.costeAsesoria||0)+(_ci.escritura||0)-(_ci.devolucionEscritura||0)+(_ci.interesesConstructora||0)+(_ci.evolucionObra||0)+(_ci.reformaApartamento||0);
+  if(!(CAPITAL_BOLSILLO>0))CAPITAL_BOLSILLO=239536;
   // (SELIC_ANUAL ya no se usa como constante única — ver proyectarSelicAnual() más abajo,
   // que construye 3 escenarios calibrados con histórico real + Boletim Focus)
 
@@ -2382,6 +2522,7 @@ function renderBreakEvenChart(){
     }
   });
 
+  if(breakEvenLabel){var _bx=$('beXcVal'),_br=$('beXrVal');if(_bx)_bx.textContent=breakEvenLabel;if(_br)_br.textContent=breakEvenLabel;}
   var añoActual=new Date().getFullYear();
   var añosFaltan=breakEvenLabel?breakEvenLabel-añoActual:null;
   $('beSummary').innerHTML=
@@ -2545,7 +2686,7 @@ function renderCapitalDesglose(){
   // Explicaciones detalladas por partida — se muestran al tocar cada línea (showInfo()).
   var explCapital={
     'Entrada a vista':'La parte de la entrada del piso que pagaste directamente en efectivo en el momento de la compra, sin financiar. R$25.000, marzo de 2021.',
-    'Entrada financiada (constructora)':'Parte de la entrada que la propia constructora te financió a corto plazo (no es la hipoteca Caixa, es un crédito directo con ellos durante la fase de construcción). R$23.000.',
+    'Entrada financiada (constructora)':'Parte de la entrada que la propia constructora te financió a corto plazo (no es la hipoteca Caixa). La fuiste pagando en cuotas de interés (abr–oct 2021, ~R$420–450/mes) y la amortizaste en nov–dic 2021, así que salió de tu bolsillo y cuenta como capital propio. R$23.000.',
     'Coste gestora':'Honorarios de la gestora que tramitó el proceso de compra del inmueble.',
     'Coste inmobiliaria':'Comisión de la inmobiliaria que intermedió en la operación de compra.',
     'Coste asesoría':'Honorarios del asesor legal/financiero que te acompañó en el cierre de la compra.',
@@ -2554,12 +2695,12 @@ function renderCapitalDesglose(){
     'Intereses constructora':'Intereses cobrados por la constructora sobre la parte financiada de la entrada, durante el periodo previo a que arrancara la hipoteca Caixa (hasta agosto de 2023).',
     'Evolución de obra':'Pagos mensuales a la constructora durante la fase de construcción del edificio (marzo 2021 – junio 2023), proporcionales al avance físico de la obra.',
     'Reforma apartamento':'Coste completo del acondicionamiento del piso para uso como Airbnb — reforma integral realizada entre septiembre de 2023 y febrero de 2024, antes de recibir al primer huésped.',
-    'Financiado por Caixa (hipoteca)':'Capital total del préstamo hipotecario con Caixa Econômica Federal, a 20 años (agosto 2023 – agosto 2043). Es deuda pendiente, no dinero que hayas puesto de tu bolsillo — pero forma parte del coste total del proyecto.'
+    'Financiado por Caixa (hipoteca)':'Capital total del préstamo hipotecario con Caixa Econômica Federal, a 20 años (agosto 2023 – julio 2043). Es deuda pendiente, no dinero que hayas puesto de tu bolsillo — pero forma parte del coste total del proyecto.'
   };
   var explGasto={
     'Intereses (Juros)':'Coste real del préstamo: lo que le pagas al banco por prestarte el dinero. A diferencia de la amortización, este dinero se pierde — no vuelve a ti en forma de patrimonio.',
-    'Amortización teórica':'La parte de la cuota mensual etiquetada como "Hipoteca/Amortización" en tu contrato — lo que en teoría debería reducir tu deuda pendiente cada mes.',
-    'Corrección Monetaria':'Ajuste por indexación (IPCA/cambio de divisa) de esta hipoteca. "Se come" parte de la amortización teórica: cuanto mayor sea la corrección, menos capital real estás amortizando aunque pagues la misma cuota.',
+    'Amortización teórica':'La parte de la cuota mensual (columna "Ev. Obra/Amortización" del Excel) que el contrato destina a devolver capital. Sale de tu bolsillo y tu Excel la resta en el Beneficio. Es dinero que en parte vuelve como patrimonio, pero la corrección monetaria reduce cuánto baja realmente la deuda.',
+    'Corrección Monetaria':'Según tus datos del Excel, NO se paga dentro de la cuota: es el ajuste por indexación que sube el saldo de la deuda cada mes (saldo nuevo = saldo anterior + corrección − amortización). Por eso no se suma al gasto, pero "se come" parte de la amortización: cuanto mayor es, menos baja realmente la deuda.',
     'Condominio':'Cuota mensual obligatoria del edificio para mantenimiento de zonas comunes, portería, ascensores, etc. Es un gasto fijo que pagarías tanto si alquilas como si no.',
     'Limpieza':'Coste de limpieza entre huéspedes. Normalmente lo repercutes al huésped como cargo aparte, pero aquí se cuenta como gasto real que sale de la operación.',
     'Luz':'Consumo eléctrico del piso durante el periodo. Varía según el uso de aire acondicionado y la ocupación.',
@@ -2628,11 +2769,12 @@ function renderCapitalDesglose(){
   // sujeto a tipo de cambio y la corrección monetaria "se come" parte de la
   // amortización nominal.
   var c=G.costes||{};
-  var amortReal=(c.hip||0)-(c.correccion||0);
+  // Amortización real = amortización teórica − corrección monetaria (la deuda baja
+  // solo esa parte). La corrección NO se suma al gasto: no es un pago de la cuota.
+  var amortReal=(c.amort||0)-(c.correccion||0);
   var partidasGasto=[
     ['Intereses (Juros)', c.juros||0],
-    ['Amortización teórica', c.hip||0],
-    ['Corrección Monetaria', c.correccion||0],
+    ['Amortización teórica', c.amort||0],
     ['Condominio', c.condo||0],
     ['Limpieza', c.limp||0],
     ['Luz', c.luz||0],
@@ -2649,15 +2791,19 @@ function renderCapitalDesglose(){
     var pct=totGasto>0?Math.round(p[1]/totGasto*100):0;
     html2+='<div class="cap-row info-clickable" onclick="showInfo(\''+p[0].replace(/'/g,"\\'")+'\',window._explGasto[\''+p[0].replace(/'/g,"\\'")+'\']||\'\')"><span class="k">'+p[0]+'</span><span class="v">R$'+fn(p[1])+' <span style="color:var(--t3);font-weight:400">('+pct+'%)</span></span></div>';
   });
-  html2+='<div class="cap-row info-clickable" style="background:var(--l1)" onclick="showInfo(\'Amortización real\',window._explGasto[\'Corrección Monetaria\']+\' Aquí ves el efecto neto: Amortización teórica menos Corrección Monetaria.\')"><span class="k" style="color:var(--t1);font-weight:600">↳ Amortización real (teórica − corrección)</span><span class="v up">R$'+fn(amortReal)+'</span></div>';
-  html2+='<div class="cap-grand-total"><span>Total gasto operativo acumulado</span><span class="v">R$'+fn(totGasto)+'</span></div>';
+  html2+='<div class="cap-grand-total"><span>Total gasto acumulado</span><span class="v">R$'+fn(totGasto)+'</span></div>';
+  // Bloque informativo (NO suma al total): qué parte de la amortización reduce de verdad la deuda
+  html2+='<div class="cap-block-hdr" style="margin-top:14px"><span class="cap-block-title">HIPOTECA · QUÉ BAJA DE VERDAD LA DEUDA</span><span class="cap-block-total">R$'+fn(amortReal)+'</span></div>';
+  html2+='<div class="cap-row info-clickable" onclick="showInfo(\'Amortización teórica\',window._explGasto[\'Amortización teórica\'])"><span class="k">Amortización teórica (ya incluida arriba)</span><span class="v">R$'+fn(c.amort||0)+'</span></div>';
+  html2+='<div class="cap-row info-clickable" onclick="showInfo(\'Corrección Monetaria\',window._explGasto[\'Corrección Monetaria\'])"><span class="k">− Corrección Monetaria (no suma al gasto)</span><span class="v dn">R$'+fn(c.correccion||0)+'</span></div>';
+  html2+='<div class="cap-row info-clickable" style="background:var(--l1)" onclick="showInfo(\'Amortización real\',window._explGasto[\'Corrección Monetaria\']+\' Aquí ves el efecto neto: Amortización teórica menos Corrección Monetaria.\')"><span class="k" style="color:var(--t1);font-weight:600">= Amortización real</span><span class="v up">R$'+fn(amortReal)+'</span></div>';
   $('capGastosCard').innerHTML=html2;
 }
 
 function renderCostesVsIngresos(){
   var c=G.costes||{};
   var explicaciones={
-    'Hipoteca (amortización)':'Parte de la cuota mensual que reduce la deuda pendiente del préstamo. No es un gasto que "se pierde" — es dinero que se convierte en patrimonio tuyo poco a poco.',
+    'Hipoteca (amortización)':'Parte de la cuota mensual que el contrato destina a devolver capital. Tu Excel la resta del Beneficio. En parte vuelve como patrimonio, pero la corrección monetaria sube el saldo y reduce cuánto baja de verdad la deuda (ver Inversión).',
     'Intereses (juros)':'Coste real del préstamo: lo que le pagas al banco por prestarte el dinero. A diferencia de la amortización, este dinero sí se pierde — no vuelve a ti en forma de patrimonio.',
     'Condominio':'Cuota mensual obligatoria del edificio para mantenimiento de zonas comunes, portería, ascensores, etc. Es un gasto fijo que pagarías tanto si alquilas como si no.',
     'Limpieza':'Coste de limpieza entre huéspedes. Normalmente lo repercutes al huésped como cargo aparte, pero aquí se cuenta como gasto real que sale de la operación.',
@@ -2669,7 +2815,7 @@ function renderCostesVsIngresos(){
     'Comisiones Wise':'Comisión por transferir el dinero cobrado en Brasil hacia tu cuenta, si usas Wise u otro servicio similar para repatriar fondos.'
   };
   var partidas=[
-    ['Hipoteca (amortización)', c.hip||0],
+    ['Hipoteca (amortización)', c.amort||0],
     ['Intereses (juros)', c.juros||0],
     ['Condominio', c.condo||0],
     ['Limpieza', c.limp||0],
