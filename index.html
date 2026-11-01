@@ -926,29 +926,82 @@ function applyConfig(){
 
 // ══ LOCALIZAR EL EXCEL (sin ruta ni ID en el código) ══
 // 1ª vez: se pregunta el nombre del Excel y se busca en OneDrive; el ID queda en este dispositivo.
+function normTxt(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();}
 async function findExcel(token){
   var H={headers:{Authorization:'Bearer '+token}};
   var cached=null;try{cached=localStorage.getItem(K_FILE);}catch(e){}
   if(cached){
-    var r=await fetch(GRAPH+'/me/drive/items/'+cached+'?$select=id,name',H);
-    if(r.ok)return (await r.json()).id;
+    var r0=await fetch(GRAPH+'/me/drive/items/'+cached+'?$select=id,name',H);
+    if(r0.ok)return (await r0.json()).id;
     try{localStorage.removeItem(K_FILE);}catch(e){}
   }
   var q=null;try{q=localStorage.getItem(K_FILEQ);}catch(e){}
   if(!q){
-    q=window.prompt('Nombre del Excel en tu OneDrive (o parte del nombre):','');
+    q=window.prompt('Nombre del Excel en tu OneDrive, o su ruta completa (carpeta/subcarpeta/archivo):','');
     if(!q||!q.trim())throw new Error('Falta el nombre del Excel');
     q=q.trim();
     try{localStorage.setItem(K_FILEQ,q);}catch(e){}
   }
-  var s=await fetch(GRAPH+'/me/drive/root/search(q=\''+encodeURIComponent(q.replace(/\'/g,"''"))+'\')?$select=id,name,lastModifiedDateTime',H);
-  if(!s.ok)throw new Error('Búsqueda del Excel falló ('+s.status+')');
-  var items=((await s.json()).value||[]).filter(function(it){return /\.xlsx$/i.test(it.name||'');});
-  if(!items.length){try{localStorage.removeItem(K_FILEQ);}catch(e){}throw new Error('No encuentro ningún .xlsx con ese nombre');}
-  var exact=items.filter(function(it){return it.name.toLowerCase()===(q.toLowerCase().replace(/\.xlsx$/,'')+'.xlsx');});
-  var pick=(exact.length?exact:items).sort(function(a,b){return String(b.lastModifiedDateTime).localeCompare(String(a.lastModifiedDateTime));})[0];
-  try{localStorage.setItem(K_FILE,pick.id);}catch(e){}
-  return pick.id;
+  var item=null, diag=[];
+  // 0) Ruta completa (si contiene "/"): acceso directo, el método más fiable
+  if(q.indexOf('/')>=0){
+    var path=q.replace(/^\/+/,'');
+    if(!/\.xlsx$/i.test(path))path+='.xlsx';
+    var rp=await fetch(GRAPH+'/me/drive/root:/'+path.split('/').map(encodeURIComponent).join('/')+'?$select=id,name',H);
+    diag.push('ruta:'+rp.status);
+    if(rp.ok)item=await rp.json();
+  }
+  if(!item){
+    var base=q.replace(/\.xlsx$/i,'').split('/').pop();
+    var toks=normTxt(base).split(/\s+/).filter(Boolean);
+    var match=function(it){var n=normTxt(it.name);return /\.xlsx$/.test(n)&&toks.every(function(t){return n.indexOf(t)>=0;});};
+    var cands=[];
+    var tryList=async function(label,url){
+      try{
+        var r=await fetch(url,H);
+        if(!r.ok){diag.push(label+':'+r.status);return;}
+        var arr=(await r.json()).value||[];
+        var hits=arr.filter(function(it){return it.name&&match(it);});
+        diag.push(label+':'+arr.length+'/'+hits.length);
+        hits.forEach(function(it){cands.push(it);});
+      }catch(e){diag.push(label+':err');}
+    };
+    var enc=function(t){return encodeURIComponent(t.replace(/\'/g,"''"));};
+    await tryList('búsqueda',GRAPH+'/me/drive/root/search(q=\''+enc(base)+'\')?$select=id,name,lastModifiedDateTime');
+    if(!cands.length&&toks.length){
+      var longest=toks.slice().sort(function(a,b){return b.length-a.length;})[0];
+      await tryList('búsqueda2',GRAPH+'/me/drive/root/search(q=\''+enc(longest)+'\')?$select=id,name,lastModifiedDateTime');
+    }
+    if(!cands.length)await tryList('recientes',GRAPH+'/me/drive/recent?$top=200');
+    if(!cands.length){
+      // Recorrido por carpetas (máx. 60 llamadas), por si el índice de búsqueda de OneDrive no lo encuentra
+      var queue=[GRAPH+'/me/drive/root/children?$select=id,name,folder,lastModifiedDateTime&$top=200'],calls=0,carp=0;
+      while(queue.length&&calls<60&&!cands.length){
+        var u=queue.shift();calls++;
+        try{
+          var rr=await fetch(u,H);
+          if(!rr.ok)continue;
+          var kids=(await rr.json()).value||[];
+          kids.forEach(function(it){
+            if(it.folder){carp++;queue.push(GRAPH+'/me/drive/items/'+it.id+'/children?$select=id,name,folder,lastModifiedDateTime&$top=200');}
+            else if(match(it))cands.push(it);
+          });
+        }catch(e){}
+      }
+      diag.push('carpetas:'+carp);
+    }
+    if(cands.length){
+      var want=normTxt(base)+'.xlsx';
+      var exact=cands.filter(function(it){return normTxt(it.name)===want;});
+      item=(exact.length?exact:cands).sort(function(a,b){return String(b.lastModifiedDateTime).localeCompare(String(a.lastModifiedDateTime));})[0];
+    }
+  }
+  if(!item){
+    try{localStorage.removeItem(K_FILEQ);}catch(e){}
+    throw new Error('No encuentro ningún .xlsx con ese nombre ['+diag.join(' · ')+']. Prueba con la ruta completa (carpeta/subcarpeta/archivo)');
+  }
+  try{localStorage.setItem(K_FILE,item.id);}catch(e){}
+  return item.id;
 }
 
 // ══ MÉTRICAS DERIVADAS ══
@@ -1424,7 +1477,7 @@ async function loadExcel(token){
   }catch(e){
     console.error('loadExcel:',e);hideLoading();
     if(localStorage.getItem(K_CON)){showApp();toast('⚠ '+e.message.substring(0,50));updateSync(false);}
-    else{toast('Error: '+e.message.substring(0,60));showAuthScreen();}
+    else{toast('Error: '+e.message.substring(0,200));showAuthScreen();}
   }
 }
 
