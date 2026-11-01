@@ -1382,7 +1382,7 @@ async function loadExcel(token){
     var wsList=(await wsResp.json()).value||[];
     // Buscar hoja Inmobiliario
     var hojaInmob=wsList.find(function(w){return w.name==='Inmobiliario';});
-    if(!hojaInmob)throw new Error('Hoja Inmobiliario no encontrada');
+    if(!hojaInmob){try{localStorage.removeItem(K_FILE);localStorage.removeItem(K_FILEQ);}catch(e2){}throw new Error('Ese Excel no tiene la hoja Inmobiliario: vuelve a sincronizar y escribe otro nombre');}
     // Hoja Config (datos fijos personales). Si falta, la app funciona sin ellos y lo indica en Ajustes.
     var hojaCfg=wsList.find(function(w){return String(w.name).trim().toLowerCase()==='config';});
     CFG={};
