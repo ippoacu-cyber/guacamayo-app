@@ -2484,6 +2484,18 @@ function renderAlertas(d){
   if(d.neto<0)html+='<div class="alert er"><div class="al-ico">!</div><div><div class="al-t">'+MABR[d.mes]+' '+d.año+': mes negativo -R$'+fn(Math.abs(d.neto))+'</div><div class="al-m">Los ingresos (R$'+fn(d.ing)+') no cubrieron los gastos este mes.</div></div></div>';
   else html+='<div class="alert ok"><div class="al-ico">→</div><div><div class="al-t">'+MABR[d.mes]+' '+d.año+': R$'+fn(d.ing)+' · neto +R$'+fn(d.neto)+'</div><div class="al-m">Saldo hipoteca: R$'+fn(G.saldo_hip)+' · ADR: R$'+G.adr_global+'/n</div></div></div>';
   html+='<div class="alert wa"><div class="al-ico">!</div><div><div class="al-t">ADR R$'+G.adr_global+' por noche</div><div class="al-m">Con una valoración alta y estatus Superhost suele haber margen para probar precios algo mayores; vigila que la ocupación no caiga.</div></div></div>';
+  // Cuadre de ingresos: la columna «Ingresos Airbnb» del Excel debe coincidir con la hoja Airbnb
+  // sumada por MES DE PAGO (criterio de Gorka). Solo se revisan los últimos 6 meses; no cambia ninguna cifra.
+  try{
+    var _now=new Date(), _bad=[];
+    for(var _k=5;_k>=0;_k--){
+      var _dd=new Date(_now.getFullYear(),_now.getMonth()-_k,1), _y=String(_dd.getFullYear()), _m=_dd.getMonth();
+      if(!H2[_y])continue;
+      var _ex=H2[_y].ing[_m]||0, _pg=gmCalcIngresosAirbnb(_m,_dd.getFullYear());
+      if((_ex>0||_pg>0)&&Math.abs(_ex-_pg)>1.5)_bad.push(MABR[_m]+' '+_y.slice(2)+': Excel R$'+fn(_ex)+' · Airbnb R$'+fn(_pg));
+    }
+    if(_bad.length)html+='<div class="alert wa"><div class="al-ico">≠</div><div><div class="al-t">Ingresos que no cuadran con la hoja Airbnb</div><div class="al-m">'+_bad.join('<br>')+'<br>Se corrigen con «+ Gastos del mes» (calcula el ingreso por fecha de pago).</div></div></div>';
+  }catch(e){console.warn('cuadre ingresos:',e);}
   $('alertsArea').innerHTML=html;
 }
 
