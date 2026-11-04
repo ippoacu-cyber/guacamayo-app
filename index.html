@@ -104,6 +104,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
 .mh-ing{font-size:36px;font-weight:700;font-family:var(--mono);line-height:1;color:var(--t1)}
 .mh-delta{font-size:12px;font-family:var(--mono);margin-top:4px}
 .mh-delta.up{color:var(--up)}.mh-delta.dn{color:var(--dn)}
+.mh-note{font-size:10px;line-height:1.45;color:var(--t3);margin-top:8px}
 .mh-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:14px}
 .mh-kpi{background:rgba(255,255,255,.04);border-radius:6px;padding:8px}
 .mh-kpi-v{font-size:13px;font-weight:600;font-family:var(--mono);color:var(--t1)}
@@ -515,6 +516,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
         <div class="mh-label" id="mesLabel">—</div>
         <div class="mh-ing" id="mesIng">—</div>
         <div class="mh-delta up" id="mesDelta"></div>
+        <div class="mh-note" id="mesNote" style="display:none">Este mes aún no está anotado en tu Excel. La cifra suma lo que Airbnb te pagará este mes según la hoja Airbnb (lo que recibes tú, ya sin la comisión), incluidos cobros que todavía no han llegado. El neto resta los gastos que haya en el Excel para este mes. Se queda fija al guardar el mes con «+ Gastos del mes».</div>
         <div class="mh-grid">
           <div class="mh-kpi"><div class="mh-kpi-v" id="mesN">—</div><div class="mh-kpi-l">Noches</div></div>
           <div class="mh-kpi"><div class="mh-kpi-v" id="mesOcc">—</div><div class="mh-kpi-l">Ocup.</div></div>
@@ -1483,7 +1485,7 @@ async function loadExcel(token){
 
 function parseDate(v){
   if(v instanceof Date)return v;
-  if(typeof v==='number'&&v>40000)return new Date((v-25569)*86400*1000);
+  if(typeof v==='number'&&v>40000){var _u=new Date(Math.round((v-25569)*86400000));return new Date(_u.getUTCFullYear(),_u.getUTCMonth(),_u.getUTCDate());}
   if(typeof v==='string'){var d=new Date(v);if(!isNaN(d))return d;}
   return null;
 }
@@ -1645,7 +1647,7 @@ var nrState={step:1,data:{}};
 function nrOpen(){
   if(!window._itemId||!window._msToken){toast('Sincroniza primero (Ajustes > Sincronizar ahora).');return;}
   nrState={step:1,data:{
-    fechaReserva:new Date().toISOString().slice(0,10),
+    fechaReserva:(function(){var t=new Date();return t.getFullYear()+'-'+('0'+(t.getMonth()+1)).slice(-2)+'-'+('0'+t.getDate()).slice(-2);})(),
     fechaEntrada:'', fechaSalida:'', huesped:'', personas:2,
     diasFinde:0, precioDia:'', precioFinde:'', precioMedio:'', limpieza:'',
     comAirbnb:'', impuestos:'', descuento:0, comAirbnbAnf:''
@@ -2408,6 +2410,24 @@ function processAirbnb(values){
 }
 
 // ══ RENDER ══
+// Ingreso y neto de un mes para mostrar en pantalla. La columna «Ingresos Airbnb» del Excel
+// manda siempre que tenga valor. SOLO para el MES EN CURSO y solo si esa celda está vacía/0
+// (el Excel se rellena al cerrar el mes con «+ Gastos del mes»), se usa el cálculo por
+// Fecha Pago de la hoja Airbnb (mismo criterio que gmCalcIngresosAirbnb) y se marca como
+// provisional (calc:true). No toca meses pasados ni sobrescribe ningún valor del Excel.
+function ingMesEf(año,mes){
+  var h=H2[String(año)];
+  var ex=h?(h.ing[mes]||0):0, nt=h?(h.neto[mes]||0):0;
+  var hoy=new Date();
+  if(ex>0||año!==hoy.getFullYear()||mes!==hoy.getMonth())return{ing:ex,neto:nt,calc:false};
+  var c=0;
+  try{c=gmCalcIngresosAirbnb(mes,año);}catch(e){console.warn('ingMesEf:',e);}
+  if(!(c>0))return{ing:ex,neto:nt,calc:false};
+  // Con ing=0 en la fila, neto = −gastos del mes → gastos = −neto
+  var gastos=h?-nt:0;
+  return{ing:Math.round(c),neto:Math.round(c-gastos),calc:true};
+}
+
 function getLastMes(){
   // El hero de Inicio muestra el MES CALENDARIO ACTUAL (hoy), no el último mes con datos.
   // Si el mes en curso aún no tiene datos en el Excel (p.ej. muy a principio de mes),
@@ -2416,7 +2436,8 @@ function getLastMes(){
   var hoy=new Date();
   var yNow=String(hoy.getFullYear()), mNow=hoy.getMonth();
   if(H2[yNow]){
-    return{año:hoy.getFullYear(),mes:mNow,ing:H2[yNow].ing[mNow]||0,neto:H2[yNow].neto[mNow]||0,
+    var ef=ingMesEf(hoy.getFullYear(),mNow);
+    return{año:hoy.getFullYear(),mes:mNow,ing:ef.ing,neto:ef.neto,calc:ef.calc,
            hip:H2[yNow].hip[mNow]||0,saldo:G.saldo_hip,
            noches:(NTS[yNow]?NTS[yNow][mNow]:0)||0,adr:(PRC[yNow]?PRC[yNow][mNow]:0)||0,res:(RES[yNow]?RES[yNow][mNow]:0)||0};
   }
@@ -2432,8 +2453,9 @@ function renderAll(){
   renderInversionDyn();
   var d=getLastMes();
   // Hero
-  $('mesLabel').textContent=MESES[d.mes].toUpperCase()+' '+d.año;
+  $('mesLabel').textContent=MESES[d.mes].toUpperCase()+' '+d.año+(d.calc?' · SEGÚN RESERVAS':'');
   $('mesIng').textContent='R$'+fn(d.ing);
+  var _mnote=$('mesNote'); if(_mnote)_mnote.style.display=d.calc?'block':'none';
   var nd=$('mesDelta');
   nd.textContent=(d.neto>=0?'+':'-')+'R$'+fn(Math.abs(d.neto))+' neto';
   nd.className='mh-delta '+(d.neto>=0?'up':'dn');
@@ -2508,12 +2530,13 @@ function renderCmpTable(){
     var noches=NTS[y]?(NTS[y][mesActual]||0):0;
     var adr=PRC[y]?(PRC[y][mesActual]||0):0;
     var res=RES[y]?(RES[y][mesActual]||0):0;
-    var ing=H2[y]?(H2[y].ing[mesActual]||0):0;
-    var neto=H2[y]?(H2[y].neto[mesActual]||0):0;
+    var _ef=ingMesEf(parseInt(y,10),mesActual);
+    var ing=_ef.ing;
+    var neto=_ef.neto;
     var isCur=(y===String(hoy.getFullYear()));
     html+='<tr class="info-clickable'+(isCur?' cur':'')+'" onclick="showCmpInfo(\''+y+'\','+mesActual+')"><td>'+MABR[mesActual]+' '+y+(isCur?' ★':'')+'</td>';
     html+='<td>'+noches+'n</td>';
-    html+='<td>R$'+fn(ing)+'</td>';
+    html+='<td>R$'+fn(ing)+(_ef.calc?'*':'')+'</td>';
     html+='<td>'+(adr?'R$'+adr:'—')+'</td>';
     html+='<td>'+res+'</td></tr>';
   });
@@ -2524,12 +2547,13 @@ function showCmpInfo(y,mesIdx){
   var noches=NTS[y]?(NTS[y][mesIdx]||0):0;
   var adr=PRC[y]?(PRC[y][mesIdx]||0):0;
   var res=RES[y]?(RES[y][mesIdx]||0):0;
-  var ing=H2[y]?(H2[y].ing[mesIdx]||0):0;
-  var neto=H2[y]?(H2[y].neto[mesIdx]||0):0;
+  var _ef=ingMesEf(parseInt(y,10),mesIdx);
+  var ing=_ef.ing;
+  var neto=_ef.neto;
   var dias=DIAS[mesIdx];
   var occ=dias?Math.round(noches/dias*100):0;
   var txt='<strong>'+noches+' noches</strong> vendidas de '+dias+' posibles ('+occ+'% ocupación)<br><br>';
-  txt+='Ingresos brutos: <strong>R$'+fn(ing)+'</strong><br>';
+  txt+='Ingresos brutos: <strong>R$'+fn(ing)+'</strong>'+(_ef.calc?' <em>(provisional: este mes aún no está en el Excel; es lo que Airbnb te pagará según la hoja Airbnb)</em>':'')+'<br>';
   txt+='Neto tras gastos: <strong>R$'+fn(neto)+'</strong><br>';
   txt+='Precio medio: <strong>'+(adr?'R$'+adr+'/noche':'sin datos')+'</strong><br>';
   txt+='Reservas con check-in este mes: <strong>'+res+'</strong>';
