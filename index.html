@@ -104,6 +104,8 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
 .mh-ing{font-size:36px;font-weight:700;font-family:var(--mono);line-height:1;color:var(--t1)}
 .mh-delta{font-size:12px;font-family:var(--mono);margin-top:4px}
 .mh-delta.up{color:var(--up)}.mh-delta.dn{color:var(--dn)}
+.data-banner{margin:8px 14px 0;padding:10px 12px;border:1px solid var(--wa);border-radius:10px;background:rgba(245,166,35,.10);color:var(--wa);font-size:11px;line-height:1.45}
+.chart-off{font-size:11px;color:var(--t3);padding:14px 4px;text-align:center}
 .mh-note{font-size:10px;line-height:1.45;color:var(--t3);margin-top:8px}
 .mh-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:14px}
 .mh-kpi{background:rgba(255,255,255,.04);border-radius:6px;padding:8px}
@@ -505,6 +507,8 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
     <div class="sync-btn" id="syncBtn" onclick="doSync()"><span class="sync-dot"></span>SYNC</div>
   </div>
 
+  <div id="dataBanner" class="data-banner" style="display:none" role="alert"></div>
+
   <!-- Scroll -->
   <div class="scroll" id="scr">
 
@@ -775,14 +779,6 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
 
 </div><!-- /app -->
 
-<!-- Panel de diagnóstico de pruebas (testAddRow) — texto seleccionable, visible hasta cerrar -->
-<div id="debugPanel" style="display:none;position:fixed;inset:0;background:#000;color:#0f0;font-family:monospace;font-size:11px;padding:14px;z-index:9999;overflow:auto;white-space:pre-wrap;word-break:break-all">
-  <div style="display:flex;justify-content:space-between;margin-bottom:10px">
-    <strong style="color:#fff">DIAGNÓSTICO testAddRow()</strong>
-    <span onclick="document.getElementById('debugPanel').style.display='none'" style="color:#fff;background:#333;padding:4px 10px;border-radius:6px">CERRAR</span>
-  </div>
-  <div id="debugPanelContent"></div>
-</div>
 
 <!-- Wizard: nueva reserva -->
 <div class="nr-overlay" id="nrOverlay">
@@ -892,8 +888,11 @@ function cfgNum(k,def){
   var v=CFG[k.toLowerCase()];
   if(v===undefined||v===null||v==='')return def;
   if(typeof v==='number')return v;
-  var s=String(v).trim();
-  var n=s.indexOf(',')>=0?parseFloat(s.replace(/\./g,'').replace(',','.')):parseFloat(s);
+  var s=String(v).trim().replace(/^R\$\s*/i,'').replace(/\s*%$/,'').replace(/\s/g,'');
+  // «125.620,00» (coma decimal), «125.620» (miles con punto) o «125620.5» (decimal con punto)
+  if(s.indexOf(',')>=0)s=s.replace(/\./g,'').replace(',','.');
+  else if(/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,'');
+  var n=parseFloat(s);
   return isNaN(n)?def:n;
 }
 function cfgStr(k,def){
@@ -910,6 +909,8 @@ function cfgYM(k){
   if(mm)return{y:+mm[1],m:+mm[2]-1};
   mm=s.match(/^(\d{1,2})[-\/](\d{4})$/);
   if(mm)return{y:+mm[2],m:+mm[1]-1};
+  mm=s.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);   // dd/mm/aaaa
+  if(mm)return{y:+mm[3],m:+mm[2]-1};
   return null;
 }
 function ymShort(ym){return ym?(MABR[ym.m].toLowerCase()+'-'+ym.y):'';}
@@ -923,7 +924,14 @@ function applyConfig(){
   var ci={};
   CFG_KEYS_CAPITAL.forEach(function(k){ci[k]=cfgNum(k,0);});
   G.capitalInicial=ci;
-  G.cfgFaltan=CFG_KEYS_REQ.filter(function(k){return !cfgHas(k);});
+  // Falta la clave, o existe pero no se puede leer (texto en un importe, fecha en otro formato):
+  // antes ese caso salía como «COMPLETA ✓» con el capital mal calculado.
+  var _fechas=['fechaCompra','hipotecaInicio','hipotecaFin'];
+  G.cfgFaltan=CFG_KEYS_REQ.filter(function(k){
+    if(!cfgHas(k))return true;
+    if(_fechas.indexOf(k)>=0)return cfgYM(k)===null;
+    return isNaN(cfgNum(k,NaN));
+  });
 }
 
 // ══ LOCALIZAR EL EXCEL (sin ruta ni ID en el código) ══
@@ -1230,14 +1238,14 @@ function fillConfigUI(){
   var st=$('cfgConfigStatus');
   if(st){
     var f=G.cfgFaltan||CFG_KEYS_REQ;
-    st.textContent=f.length?('FALTAN '+f.length+' CLAVES'):'COMPLETA ✓';
+    st.textContent=f.length?('REVISA '+f.length+' CLAVES'):'COMPLETA ✓';
     st.style.color=f.length?'var(--wa)':'var(--up)';
   }
   var tp=$('cfgTemplate');
   if(tp){
     var f2=G.cfgFaltan||CFG_KEYS_REQ;
     tp.style.display=f2.length?'block':'none';
-    tp.textContent='Hoja «Config» (A: Clave · B: Valor · C: Nota). Faltan: '+f2.join(', ')+'.';
+    tp.textContent='Hoja «Config» (A: Clave · B: Valor · C: Nota). Faltan o no se pueden leer: '+f2.join(', ')+'.';
   }
 }
 
@@ -1251,6 +1259,7 @@ function loadFromCache(){
     processExcel(c.inmobiliario);
     if(c.airbnb)processAirbnb(c.airbnb);
     window._inmobRaw=c.inmobiliario;window._airbnbRaw=c.airbnb||null;
+    checkColumnas(c.inmobiliario,c.airbnb||null);
     return true;
   }catch(e){console.warn('Caché no utilizable:',e);return false;}
 }
@@ -1475,18 +1484,60 @@ async function loadExcel(token){
     window._itemId=itemId; window._msToken=token; // para pruebas de escritura desde consola (temporal)
     window._inmobRaw=values; window._inmobHeaderRow=null; // caché cruda para el wizard de gastos
     window._airbnbRaw=values2; // caché cruda para calcular Ingresos Airbnb por mes de pago
+    checkColumnas(values,values2);
     hideLoading();showApp();updateSync(true);toast('Excel sincronizado ✓');
   }catch(e){
     console.error('loadExcel:',e);hideLoading();
-    if(localStorage.getItem(K_CON)){showApp();toast('⚠ '+e.message.substring(0,50));updateSync(false);}
+    if(localStorage.getItem(K_CON)){
+      // Antes: showApp() con todo a 0 aunque hubiera caché. Ahora se carga la caché si no hay datos de esta sesión.
+      var _hay=!!window._inmobRaw||loadFromCache();
+      showApp();
+      toast(_hay?('⚠ '+e.message.substring(0,50)+' · datos locales'):('⚠ Sin datos: '+e.message.substring(0,50)));
+      updateSync(false);
+    }
     else{toast('Error: '+e.message.substring(0,200));showAuthScreen();}
   }
 }
 
+// Columnas que la app lee por nombre. Si una cambia de nombre o desaparece, la cifra
+// correspondiente saldría a 0 sin avisar: este banner lo hace visible.
+var COLS_REQ_INM=['Fecha','Hipoteca/Amortizacion','Juros','Ev. Obra/\nAmortización','Corrección\nMonetaria','Seguro','Tasas','Saldo\nDevedor','Condominio','Luz','Internet','Limpieza','Mantenimiento','Comisiones \nWise','Ingresos Airbnb'];
+var COLS_REQ_AIR=['Fecha Entrada','Fecha Salida','Fecha Pago','TOT. Noches','TOT. Anfitrion','Promedio Anfitrion / Noche','Limpieza','Com. Airbnb','Impuestos','TOT. Huesped','Descuento Dado','Com. Airbnb Anfitrion','Huesped'];
+function _cabecera(values,clave){
+  for(var r=0;r<Math.min((values||[]).length,10);r++){
+    if(values[r]&&values[r].some(function(c){return String(c||'').trim()===clave;}))return values[r];
+  }
+  return null;
+}
+function checkColumnas(inm,air){
+  var falt=[];
+  var hi=_cabecera(inm,'Fecha');
+  if(!hi)falt.push('hoja Inmobiliario: no se encuentra la fila de cabeceras');
+  else COLS_REQ_INM.forEach(function(c){if(findCol(hi,c)<0)falt.push('Inmobiliario: «'+c.replace(/\n/g,' ')+'»');});
+  if(air){
+    var ha=_cabecera(air,'Fecha Entrada');
+    if(!ha)falt.push('hoja Airbnb: no se encuentra la fila de cabeceras');
+    else COLS_REQ_AIR.forEach(function(c){if(findCol(ha,c)<0)falt.push('Airbnb: «'+c+'»');});
+  }
+  var b=document.getElementById('dataBanner');
+  if(b){
+    if(falt.length){
+      b.textContent='Falta o ha cambiado de nombre en el Excel: '+falt.join(' · ')+'. Las cifras que dependen de esas columnas saldrán a 0 hasta que se corrija.';
+      b.style.display='block';
+    }else{b.style.display='none';b.textContent='';}
+  }
+  return falt;
+}
 function parseDate(v){
   if(v instanceof Date)return v;
   if(typeof v==='number'&&v>40000){var _u=new Date(Math.round((v-25569)*86400000));return new Date(_u.getUTCFullYear(),_u.getUTCMonth(),_u.getUTCDate());}
-  if(typeof v==='string'){var d=new Date(v);if(!isNaN(d))return d;}
+  if(typeof v==='string'){
+    // «2026-11-05» sin hora: new Date(texto) lo toma como medianoche UTC y en São Paulo
+    // (UTC-3) sale el día anterior. Se construye como fecha local.
+    var _m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v.trim());
+    if(_m)return new Date(+_m[1],+_m[2]-1,+_m[3]);
+    var d=new Date(v);if(!isNaN(d))return d;
+  }
   return null;
 }
 
@@ -1518,6 +1569,9 @@ function processExcel(values){
   var cIng=findCol(headerRow,'Ingresos Airbnb');
   if(cFecha<0||cHip<0){console.warn('Inmobiliario: columnas clave no encontradas');return;}
 
+  // Reiniciar H2: si un mes se pone a 0 o se borra en el Excel, no debe conservar el valor
+  // anterior tras «SYNC» (antes solo se escribían los meses con saldo o ingresos > 0).
+  Object.keys(H2).forEach(function(_k){['ing','neto','hip','saldo','hg'].forEach(function(_f){H2[_k][_f]=[0,0,0,0,0,0,0,0,0,0,0,0];});});
   var updated=0;
   var serieCM=[]; // meses ya transcurridos con saldo: base del "TAE real con CM"
   var costes={hip:0,juros:0,amort:0,correccion:0,seguro:0,tasas:0,condo:0,luz:0,net:0,limp:0,manto:0,wise:0};
@@ -1624,8 +1678,6 @@ function processExcel(values){
 // Noches y ADR: se prorratean día a día entre Fecha Entrada y Fecha Salida,
 // así una reserva que cruza de mes reparte sus noches en cada mes real.
 
-// ══ PRUEBA CONTROLADA v3: añadir fila + reparar fórmulas, con panel visible en pantalla ══
-// Uso: consola del navegador → testAddRow()
 // Convierte una Date de JS al número de serie Excel (días desde 1899-12-30, mismo
 // epoch que usa parseDate() al leer). Escribir el string ISO directamente hace que
 // Excel lo trate como TEXTO, no como fecha real — confirmado con una prueba real
@@ -1652,6 +1704,8 @@ function nrOpen(){
     diasFinde:0, precioDia:'', precioFinde:'', precioMedio:'', limpieza:'',
     comAirbnb:'', impuestos:'', descuento:0, comAirbnbAnf:''
   }};
+  var _bN=document.getElementById('nrBtnNext'),_bB=document.getElementById('nrBtnBack');
+  _bN.setAttribute('onclick','nrNext()');_bN.disabled=false;_bB.disabled=false;_bB.style.display='';
   document.getElementById('nrOverlay').classList.add('on');
   nrRenderStep();
 }
@@ -1773,9 +1827,9 @@ async function nrSave(){
 
   try{
     var siguienteCont=(G.tot_res||0)+1;
-    var serialReserva=toExcelSerial(new Date(d.fechaReserva));
-    var serialEntrada=toExcelSerial(new Date(d.fechaEntrada));
-    var serialSalida=toExcelSerial(new Date(d.fechaSalida));
+    var serialReserva=toExcelSerial(parseDate(d.fechaReserva));
+    var serialEntrada=toExcelSerial(parseDate(d.fechaEntrada));
+    var serialSalida=toExcelSerial(parseDate(d.fechaSalida));
     var row=[
       siguienteCont, serialReserva, serialEntrada, serialSalida,
       0,0,0,0,                          // Antelación, Mes Pago, Año Pago, Fecha Pago (fórmula)
@@ -1868,6 +1922,8 @@ function gmOpen(){
     hipoteca:'', juros:'', evObra:'', seguro:'', tasas:'', correccion:'',
     otros:0, condominio:'', luz:'', internet:'', limpieza:'', mantenimiento:'', wise:''
   },filaExistente:null,filaHoja:null};
+  var bN=document.getElementById('gmBtnNext'),bB=document.getElementById('gmBtnBack');
+  bN.setAttribute('onclick','gmNext()');bN.disabled=false;bB.disabled=false;bB.style.display='';
   document.getElementById('gmOverlay').classList.add('on');
   gmRenderStep();
 }
@@ -1879,6 +1935,9 @@ function gmCollectStep(){
     var f=el.getAttribute('data-field');
     var v=el.value;
     if(el.type==='number')v=v===''?'':parseFloat(v);
+    // El mes viene de un <select>: es texto ("10"). Las comparaciones de fila usan ===,
+    // así que hay que guardarlo como entero (si no, nunca se encuentra la fila existente).
+    if(f==='mes'||f==='año')v=(v===''||v==null)?'':parseInt(v,10);
     gmState.data[f]=v;
   });
 }
@@ -1934,7 +1993,7 @@ function gmRenderStep(){
 
   if(gmState.step===1){
     document.getElementById('gmTitle').textContent='Mes e hipoteca';
-    var mesOpts=MESES_GM.map(function(m,i){return '<option value="'+i+'"'+(i===d.mes?' selected':'')+'>'+m+'</option>';}).join('');
+    var mesOpts=MESES_GM.map(function(m,i){return '<option value="'+i+'"'+(i===+d.mes?' selected':'')+'>'+m+'</option>';}).join('');
     b.innerHTML=
       '<div class="nr-step-title">PASO 1 DE 2 — MES E HIPOTECA</div>'+
       '<div class="nr-row2">'+
@@ -1983,6 +2042,7 @@ function gmRenderStep(){
 // Busca en la caché cruda de Inmobiliario si ya existe fila para ese mes/año.
 // Devuelve el número de fila REAL de la hoja si existe, o null si no.
 function gmFindMesRow(mes,año){
+  mes=parseInt(mes,10);año=parseInt(año,10);
   var raw=window._inmobRaw;
   if(!raw)return null;
   var headerRowIdx=-1, headerRow=null;
@@ -2012,6 +2072,7 @@ function gmFindMesRow(mes,año){
 // que trae hoy esa columna depende de un libro externo que a veces va con retraso
 // (confirmado: agosto 2026 mostraba 0 en el Excel real, teniendo ya reservas pagadas).
 function gmCalcIngresosAirbnb(mes,año){
+  mes=parseInt(mes,10);año=parseInt(año,10);
   var raw=window._airbnbRaw;
   if(!raw)return 0;
   var headerRowIdx=-1, headerRow=null;
@@ -2154,131 +2215,6 @@ async function gmSave(){
     btn.disabled=false;btn.textContent='Cerrar';
     btn.onclick=function(){gmClose();};
   }
-}
-
-function debugLog(txt){
-  var p=document.getElementById('debugPanel');
-  var c=document.getElementById('debugPanelContent');
-  if(p&&c){p.style.display='block';c.textContent+=txt+'\n\n';}
-  console.log(txt);
-}
-async function testAddRow(){
-  document.getElementById('debugPanelContent').textContent='';
-  if(!window._itemId||!window._msToken){debugLog('ERROR: Primero sincroniza la app (Ajustes > Sincronizar ahora).');return;}
-  var siguienteCont=(G.tot_res||0)+1;
-  var serialReserva=toExcelSerial(new Date());
-  var serialEntrada=toExcelSerial(new Date(2027,0,15)); // 15 enero 2027
-  var serialSalida=toExcelSerial(new Date(2027,0,18));  // 18 enero 2027
-  var row=[
-    siguienteCont, serialReserva, serialEntrada, serialSalida,
-    0,0,0,0, 2, 'TEST BORRAR', 0,0, 1, 280,320,290,150,120,5, 0,0,0, 0,25, 0,0
-  ];
-  debugLog('Fechas como número de serie Excel: reserva='+serialReserva+' entrada='+serialEntrada+' salida='+serialSalida);
-  debugLog('PASO 1 — insertando fila…\nURL: '+GRAPH+'/me/drive/items/'+window._itemId+'/workbook/worksheets/Airbnb/tables/Tabla5/rows/add\nBody: '+JSON.stringify({index:null,values:[row]}));
-  var r1,d1;
-  try{
-    r1=await fetch(GRAPH+'/me/drive/items/'+window._itemId+'/workbook/worksheets/Airbnb/tables/Tabla5/rows/add',{
-      method:'POST',
-      headers:{Authorization:'Bearer '+window._msToken,'Content-Type':'application/json'},
-      body:JSON.stringify({index:null,values:[row]})
-    });
-    d1=await r1.json();
-  }catch(e){debugLog('ERROR DE RED en paso 1: '+e.message);return;}
-  debugLog('Respuesta paso 1 — status '+r1.status+':\n'+JSON.stringify(d1,null,2));
-  if(!r1.ok){debugLog('❌ FALLÓ el paso 1. Parar aquí.');return;}
-
-  var filaIdx=d1.index;
-  var filaHoja=filaIdx+5;
-  debugLog('✓ Fila insertada. índice tabla='+filaIdx+' → fila real en la hoja='+filaHoja);
-
-  var COLS_F_AA=['F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA'];
-  var formulaPorCol={
-    F:'=Tabla5[[#This Row],[Fecha Entrada]]-Tabla5[[#This Row],[Fecha Reserva]]',
-    G:'=TEXT(Tabla5[[#This Row],[Fecha Pago]],"mmm")',
-    H:'=TEXT(Tabla5[[#This Row],[Fecha Pago]],"aa")',
-    I:'=Tabla5[[#This Row],[Fecha Entrada]]+1',
-    L:'=Tabla5[[#This Row],[Fecha Salida]]-Tabla5[[#This Row],[Fecha Entrada]]',
-    M:'=Tabla5[[#This Row],[TOT. Noches]]-Tabla5[[#This Row],[Dias Finde]]',
-    U:'=((Q'+filaHoja+'*M'+filaHoja+')+(Q'+filaHoja+'*N'+filaHoja+'))+R'+filaHoja+'+S'+filaHoja+'+T'+filaHoja,
-    V:'=Tabla5[[#This Row],[TOT. Huesped]]/Tabla5[[#This Row],[TOT. Noches]]',
-    W:'=(Tabla5[[#This Row],[Dias Sem]]*Tabla5[[#This Row],[Precio Dia]])+(Tabla5[[#This Row],[Dias Finde]]*Tabla5[[#This Row],[Precio Finde]])',
-    Z:'=Tabla5[[#This Row],[TOT. Sin Limpieza (A)]]-Tabla5[[#This Row],[Descuento Dado]]-Tabla5[[#This Row],[Com. Airbnb Anfitrion]]+Tabla5[[#This Row],[Limpieza]]',
-    AA:'=Tabla5[[#This Row],[TOT. Anfitrion]]/Tabla5[[#This Row],[TOT. Noches]]'
-  };
-  var formulas=[COLS_F_AA.map(function(c){return formulaPorCol[c]||null;})];
-  var patchUrl=GRAPH+'/me/drive/items/'+window._itemId+'/workbook/worksheets/Airbnb/range(address=\'F'+filaHoja+':AA'+filaHoja+'\')';
-  debugLog('PASO 2 — reparando fórmulas de la fila '+filaHoja+'…\nURL: '+patchUrl+'\nColumnas ('+COLS_F_AA.length+'): '+COLS_F_AA.join(',')+'\nBody: '+JSON.stringify({formulas:formulas}));
-
-  var r2,d2;
-  try{
-    r2=await fetch(patchUrl,{
-      method:'PATCH',
-      headers:{Authorization:'Bearer '+window._msToken,'Content-Type':'application/json'},
-      body:JSON.stringify({formulas:formulas})
-    });
-    d2=await r2.json();
-  }catch(e){debugLog('ERROR DE RED en paso 2: '+e.message);return;}
-  window._lastTestResult={filaHoja:filaHoja,patchUrl:patchUrl,status:r2.status,response:d2};
-  debugLog('Respuesta paso 2 — status '+r2.status+':\n'+JSON.stringify(d2,null,2));
-  if(!r2.ok){debugLog('❌ FALLÓ el paso 2.');return;}
-  debugLog('✓✓ TODO OK. Ve a tu Excel, fila '+filaHoja+' ("TEST BORRAR"), y comprueba que ya no hay #¡VALOR!');
-}
-
-// Reintenta SOLO el paso 2 (reparar fórmulas) sobre una fila que ya existe,
-// sin crear una fila nueva. Uso: testRepairRow(131)  ← número de fila real en la hoja
-async function testRepairRow(filaHoja){
-  document.getElementById('debugPanelContent').textContent='';
-  if(!window._itemId||!window._msToken){debugLog('ERROR: Primero sincroniza la app.');return;}
-
-  // Paso previo: corregir Fecha Reserva (C), Fecha Entrada (D) y Fecha Salida (E),
-  // que se guardaron como TEXTO (string ISO) en vez de número de serie Excel — esa
-  // es la causa real del #VALOR!, no las fórmulas en sí.
-  var serialReserva=toExcelSerial(new Date());
-  var serialEntrada=toExcelSerial(new Date(2027,0,15));
-  var serialSalida=toExcelSerial(new Date(2027,0,18));
-  var datesUrl=GRAPH+'/me/drive/items/'+window._itemId+'/workbook/worksheets/Airbnb/range(address=\'C'+filaHoja+':E'+filaHoja+'\')';
-  debugLog('PASO 0 — corrigiendo fechas (estaban como texto) en '+datesUrl+'\nserialReserva='+serialReserva+' serialEntrada='+serialEntrada+' serialSalida='+serialSalida);
-  try{
-    var r0=await fetch(datesUrl,{
-      method:'PATCH',
-      headers:{Authorization:'Bearer '+window._msToken,'Content-Type':'application/json'},
-      body:JSON.stringify({values:[[serialReserva,serialEntrada,serialSalida]],numberFormat:[['dd-mmm-yy','dd-mmm-yy','dd-mmm-yy']]})
-    });
-    var d0=await r0.json();
-    debugLog('Respuesta paso 0 — status '+r0.status+':\n'+JSON.stringify(d0,null,2));
-    if(!r0.ok){debugLog('❌ FALLÓ el paso 0 (fechas). Parar aquí.');return;}
-  }catch(e){debugLog('ERROR DE RED en paso 0: '+e.message);return;}
-
-  var COLS_F_AA=['F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA'];
-  var formulaPorCol={
-    F:'=Tabla5[[#This Row],[Fecha Entrada]]-Tabla5[[#This Row],[Fecha Reserva]]',
-    G:'=TEXT(Tabla5[[#This Row],[Fecha Pago]],"mmm")',
-    H:'=TEXT(Tabla5[[#This Row],[Fecha Pago]],"aa")',
-    I:'=Tabla5[[#This Row],[Fecha Entrada]]+1',
-    L:'=Tabla5[[#This Row],[Fecha Salida]]-Tabla5[[#This Row],[Fecha Entrada]]',
-    M:'=Tabla5[[#This Row],[TOT. Noches]]-Tabla5[[#This Row],[Dias Finde]]',
-    U:'=((Q'+filaHoja+'*M'+filaHoja+')+(Q'+filaHoja+'*N'+filaHoja+'))+R'+filaHoja+'+S'+filaHoja+'+T'+filaHoja,
-    V:'=Tabla5[[#This Row],[TOT. Huesped]]/Tabla5[[#This Row],[TOT. Noches]]',
-    W:'=(Tabla5[[#This Row],[Dias Sem]]*Tabla5[[#This Row],[Precio Dia]])+(Tabla5[[#This Row],[Dias Finde]]*Tabla5[[#This Row],[Precio Finde]])',
-    Z:'=Tabla5[[#This Row],[TOT. Sin Limpieza (A)]]-Tabla5[[#This Row],[Descuento Dado]]-Tabla5[[#This Row],[Com. Airbnb Anfitrion]]+Tabla5[[#This Row],[Limpieza]]',
-    AA:'=Tabla5[[#This Row],[TOT. Anfitrion]]/Tabla5[[#This Row],[TOT. Noches]]'
-  };
-  var formulas=[COLS_F_AA.map(function(c){return formulaPorCol[c]||null;})];
-  var patchUrl=GRAPH+'/me/drive/items/'+window._itemId+'/workbook/worksheets/Airbnb/range(address=\'F'+filaHoja+':AA'+filaHoja+'\')';
-  debugLog('PATCH URL: '+patchUrl+'\nBody: '+JSON.stringify({formulas:formulas}));
-  var r,d;
-  try{
-    r=await fetch(patchUrl,{
-      method:'PATCH',
-      headers:{Authorization:'Bearer '+window._msToken,'Content-Type':'application/json'},
-      body:JSON.stringify({formulas:formulas})
-    });
-    d=await r.json();
-  }catch(e){debugLog('ERROR DE RED: '+e.message);return;}
-  window._lastTestResult={filaHoja:filaHoja,patchUrl:patchUrl,status:r.status,response:d};
-  debugLog('Respuesta — status '+r.status+':\n'+JSON.stringify(d,null,2));
-  if(!r.ok){debugLog('❌ FALLÓ.');return;}
-  debugLog('✓ Reparado. Revisa la fila '+filaHoja+' en tu Excel.');
 }
 
 function findCol(headerRow,name){
@@ -2716,6 +2652,22 @@ function renderResumenGeneral(){
   $('rgPorAño').innerHTML=pyHtml;
 }
 
+// Crea un gráfico solo si Chart.js se cargó. Sin red o con la CDN bloqueada, el resto de la
+// pantalla (resúmenes, tablas) sigue funcionando y el hueco del gráfico lo explica.
+function mkChart(id,cfg){
+  var cv=document.getElementById(id);
+  if(!cv)return null;
+  if(typeof Chart==='undefined'){
+    if(cv.parentNode&&!cv.parentNode.querySelector('.chart-off')){
+      var m=document.createElement('div');m.className='chart-off';
+      m.textContent='Gráfico no disponible: no se pudo cargar la librería de gráficos (sin conexión).';
+      cv.parentNode.appendChild(m);
+    }
+    return null;
+  }
+  var off=cv.parentNode.querySelector('.chart-off');if(off)off.remove();
+  return new Chart(cv,cfg);
+}
 function renderBreakEvenChart(){
   // Capital de bolsillo = cash-out propio completo (partidas de la hoja Config). Incluye la parte de la entrada
   // que la constructora financió a corto plazo y que el propietario pagó/amortizó él mismo. Excluye la hipoteca.
@@ -2783,7 +2735,7 @@ function renderBreakEvenChart(){
 
   var splitIdx=serie.length-1;
   if(window._beChartInstance)window._beChartInstance.destroy();
-  window._beChartInstance=new Chart(document.getElementById('beChart'),{
+  window._beChartInstance=mkChart('beChart',{
     type:'line',
     data:{labels:labels,datasets:[
       {label:'Ingresos',data:ingData,borderColor:'#4ade80',backgroundColor:'rgba(74,222,128,.08)',borderWidth:2,pointRadius:0,fill:true,tension:.2},
@@ -2934,7 +2886,7 @@ function renderBreakEvenChart(){
   }).join('')+'<span style="width:100%;font-size:9px;color:var(--t3);margin-top:2px">Línea sólida = Selic · línea punteada = Airbnb</span>';
 
   if(window._selicChartInstance)window._selicChartInstance.destroy();
-  window._selicChartInstance=new Chart(document.getElementById('selicChart'),{
+  window._selicChartInstance=mkChart('selicChart',{
     type:'line',
     data:{labels:proyLabels,datasets:[].concat(escenarios.map(function(e){
       return {label:e.label+' (Selic)',data:selicAcumSeries[e.key],borderColor:e.color,borderWidth:2,pointRadius:0,tension:.15};
