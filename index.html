@@ -682,7 +682,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--san
       <div class="card cap-block" id="capGastosCard" style="margin-top:10px"></div>
 
       <div class="sh"><span>INGRESOS VS GASTOS · BREAK-EVEN</span><div class="sh-line"></div><span class="sh-help-btn" onclick="togHelp(this)">?</span></div>
-      <div class="sh-help"><div class="sh-help-inner">Compara, mes a mes, cuánto llevas ingresado (acumulado) frente a cuánto llevas gastado más el capital de bolsillo que pusiste al principio. El punto donde la línea de ingresos cruza la de gastos+capital es el <strong>break-even</strong>: a partir de ahí, el Airbnb empieza a darte más de lo que pusiste. La línea de proyección continúa al ritmo medio de los últimos 12 meses.</div></div>
+      <div class="sh-help"><div class="sh-help-inner">Compara, mes a mes, cuánto llevas ingresado (acumulado) frente a cuánto llevas gastado más el capital de bolsillo que pusiste al principio. El punto donde la línea de ingresos cruza la de gastos+capital es el <strong>break-even</strong>: a partir de ahí, el Airbnb empieza a darte más de lo que pusiste. La línea de proyección continúa al ritmo medio de los últimos 12 meses y llega como mínimo hasta el fin de la hipoteca. El <strong>balance a fin de hipoteca</strong> es lo que habrías ingresado menos lo gastado y el capital inicial en esa fecha: positivo = el Airbnb ya habría devuelto lo puesto y dejado ese excedente. Es una proyección a ritmo constante (sin inflación, sin cambios de precio ni ocupación), no una previsión.</div></div>
       <div class="card">
         <div class="be-wrap">
           <div class="be-legend" id="beLegend"></div>
@@ -2689,7 +2689,7 @@ function renderBreakEvenChart(){
     if(!H2[y])return;
     for(var m=0;m<12;m++){
       if(H2[y].ing[m]>0){
-        serie.push({label:MABR[m]+' '+y.slice(2),ing:H2[y].ing[m],neto:H2[y].neto[m]});
+        serie.push({label:MABR[m]+' '+y.slice(2),ing:H2[y].ing[m],neto:H2[y].neto[m],y:+y,m:m});
       }
     }
   });
@@ -2712,20 +2712,27 @@ function renderBreakEvenChart(){
   var netoMedioMes=ultimos12.reduce(function(s,x){return s+x.neto;},0)/ultimos12.length;
   var gastoMedioMes=ingMedioMes-netoMedioMes;
 
+  // La proyección llega como mínimo al fin de la hipoteca (hoja Config) y, si el break-even
+  // aún no se ha cruzado para entonces, sigue hasta cruzarlo (máx. 20 años desde hoy).
+  // Antes se detenía en el mismo mes del cruce y la gráfica no enseñaba nada después.
+  var _last=serie[serie.length-1];
+  var _finBE=cfgYM('hipotecaFin');
+  var mesesHastaFin=_finBE?Math.max(0,(_finBE.y-_last.y)*12+(_finBE.m-_last.m)):0;
   var mesesProyeccion=0, ingProy=ingAcum, gastoProy=gastoAcumConCapital;
-  var breakEvenLabel=null;
-  while(ingProy<gastoProy && mesesProyeccion<240){
+  var breakEvenLabel=null, balanceFin=null, fechaFinProy=null;
+  if(ingProy>=gastoProy)breakEvenLabel=_last.y; // ya cruzado en datos reales
+  while(mesesProyeccion<mesesHastaFin || (!breakEvenLabel && mesesProyeccion<240)){
     mesesProyeccion++;
     ingProy+=ingMedioMes;
     gastoProy+=gastoMedioMes;
-    var _op0=(V.n&&V.n.op)||{y:2024,m:1};
-    var fecha=new Date(_op0.y,_op0.m+serie.length-1+mesesProyeccion,1);
+    var fecha=new Date(_last.y,_last.m+mesesProyeccion,1);
     labels.push(MABR[fecha.getMonth()]+' '+String(fecha.getFullYear()).slice(2));
     ingData.push(Math.round(ingProy));
     gastoData.push(Math.round(gastoProy));
     if(ingProy>=gastoProy&&!breakEvenLabel){
       breakEvenLabel=fecha.getFullYear();
     }
+    if(mesesProyeccion===mesesHastaFin){balanceFin=ingProy-gastoProy;fechaFinProy=MABR[fecha.getMonth()]+' '+fecha.getFullYear();}
   }
 
   $('beLegend').innerHTML=
@@ -2758,7 +2765,8 @@ function renderBreakEvenChart(){
     '<div class="be-stat"><div class="be-stat-lbl">CAPITAL DE BOLSILLO</div><div class="be-stat-val">R$'+fn(CAPITAL_BOLSILLO)+'</div></div>'+
     '<div class="be-stat"><div class="be-stat-lbl">FLUJO NETO/MES (12m)</div><div class="be-stat-val '+(netoMedioMes>=0?'up':'dn')+'">R$'+fn(Math.round(netoMedioMes))+'</div></div>'+
     '<div class="be-stat"><div class="be-stat-lbl">BREAK-EVEN ESTIMADO</div><div class="be-stat-val ac">'+(breakEvenLabel||'+20 años')+'</div></div>'+
-    '<div class="be-stat"><div class="be-stat-lbl">FALTAN (AL RITMO ACTUAL)</div><div class="be-stat-val">'+(añosFaltan!=null?añosFaltan+' años':'—')+'</div></div>';
+    '<div class="be-stat"><div class="be-stat-lbl">FALTAN (AL RITMO ACTUAL)</div><div class="be-stat-val">'+(añosFaltan!=null?añosFaltan+' años':'—')+'</div></div>'+
+    (balanceFin!=null?'<div class="be-stat"><div class="be-stat-lbl">BALANCE A FIN DE HIPOTECA ('+fechaFinProy.toUpperCase()+')</div><div class="be-stat-val '+(balanceFin>=0?'up':'dn')+'">'+(balanceFin>=0?'+':'−')+'R$'+fn(Math.round(balanceFin))+'</div></div>':'');
 
   // ══════════════════════════════════════════════════════════════
   // PROYECCIÓN A 10 AÑOS: Selic (3 escenarios) vs Flujo neto Airbnb
